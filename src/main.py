@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
 app = FastAPI()
-app.include_router(user, prefix="/user", tags="user")
+app.include_router(user, prefix="/user", tags=["user"])
 
 # 配置 CORS 中间件
 app.add_middleware(
