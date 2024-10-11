@@ -5,9 +5,6 @@ from src.schema import *
 user = APIRouter()
 
 
-@user.get("/", description="得到所有用户")
-async def get_all_users():
-    return
 
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
