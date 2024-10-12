@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi import HTTPException
 from src.schema import *
 
@@ -37,8 +37,19 @@ async def login_user(new_user: UserSchema):
     if new_user.password != user_exist.password:
         raise HTTPException(status_code=400, detail="The password is incorrect")
     # 验证码 TODO
+        # 返回用户信息（排除敏感数据）
+    user_data = {
+        "number": user_exist.number,
+        "username": user_exist.username,  # 假设你的 User 模型有一个 name 字段
+        "avatar": user_exist.avatar,  # 假设有 email 字段
+    }
+    return {"data": user_data}
 
-    return {"data": "登陆成功"}
+@user.put('/avatar/{number}', description="修改头像")
+async def update_avatar(number:int, avatar: UploadFile = File()):
+    return
+
+
 
 
 
@@ -52,12 +63,10 @@ async def update_user(new_user: UserSchema):
     # 更新用户信息
     user_exist.password = new_user.password
     user_exist.avatar = new_user.avatar
+    user_exist.username = new_user.username
     # 保存更新
     await user_exist.save()
     return {"data": "用户信息更新成功"}
-
-
-
 
 
 
