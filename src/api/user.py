@@ -1,10 +1,10 @@
+import os
+
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi import HTTPException
 from src.schema import *
 
 user = APIRouter()
-
-
 
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
@@ -45,12 +45,20 @@ async def login_user(new_user: UserSchema):
     }
     return {"data": user_data}
 
+
 @user.put('/avatar/{number}', description="修改头像")
-async def update_avatar(number:int, avatar: UploadFile = File()):
+async def update_avatar(number: str, avatar: UploadFile = File()):
+    # 1. 定义保存文件的路径
+    save_directory = "static"  # 存放头像文件的目录
+
+    # 2. 确定文件保存的路径和名称
+    file_extension = os.path.splitext(avatar.filename)[1]  # 获取文件的扩展名
+    save_path = os.path.join(save_directory, f"{number}{file_extension}")  # 例如: avatars/12345.jpg
+
+    # 3. 将上传的文件保存到指定路径
+    with open(save_path, "wb") as buffer:
+        buffer.write(await avatar.read())  # 异步读取文件并写入到本地文件中
     return
-
-
-
 
 
 @user.put("/", description="修改用户信息")
@@ -64,6 +72,7 @@ async def update_user(new_user: UserSchema):
     user_exist.password = new_user.password
     user_exist.avatar = new_user.avatar
     user_exist.username = new_user.username
+
     # 保存更新
     await user_exist.save()
     return {"data": "用户信息更新成功"}

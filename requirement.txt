@@ -1,4 +1,6 @@
-fastapi
-tortoise-orm
-aiomysql
-aerich
+fastapi==0.114.1
+tortoise-orm==0.21.6
+aiomysql==0.2.0
+aerich==0.7.2
+uvicorn==0.30.6
+python-multipart
