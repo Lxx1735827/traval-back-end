@@ -4,3 +4,4 @@ aiomysql==0.2.0
 aerich==0.7.2
 uvicorn==0.30.6
 python-multipart
+aiofiles

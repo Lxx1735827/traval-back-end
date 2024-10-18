@@ -7,6 +7,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `name` VARCHAR(20) NOT NULL  COMMENT '景点名字',
     `city` VARCHAR(20) NOT NULL  COMMENT '城市',
+    `description` VARCHAR(1000) NOT NULL  COMMENT '景点描述',
     `picture` VARCHAR(40) NOT NULL  COMMENT '景点图片' DEFAULT 'static/site/默认图片.png',
     `location` VARCHAR(40) NOT NULL  COMMENT '景点地址',
     `longitude` DECIMAL(9,6) NOT NULL  COMMENT '经度',
