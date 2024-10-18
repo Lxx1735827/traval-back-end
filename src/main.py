@@ -2,13 +2,14 @@ from fastapi import FastAPI
 from setting import *
 import uvicorn
 from api.user import user
+from api.site import site
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.include_router(user, prefix="/user", tags=["user"])
-
+app.include_router(site, prefix="/site", tags=["site"])
 
 # 配置 CORS 中间件
 app.add_middleware(
@@ -30,4 +31,4 @@ register_tortoise(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
