@@ -1,4 +1,5 @@
 import os
+import aiofiles
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
@@ -47,17 +48,20 @@ async def login_user(new_user: UserSchema):
 
 @user.put('/avatar/{number}', description="修改头像")
 async def update_avatar(number: str, avatar: UploadFile = File()):
-    # 1. 定义保存文件的路径
-    save_directory = "static"  # 存放头像文件的目录
+    user_exist = await User.get_or_none(number=number)
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="该用户不存在")
 
-    # 2. 确定文件保存的路径和名称
+    save_directory = "static/user"  # 存放头像文件的目录
     file_extension = os.path.splitext(avatar.filename)[1]  # 获取文件的扩展名
     save_path = os.path.join(save_directory, f"{number}{file_extension}")  # 例如: avatars/12345.jpg
+    user_exist.avatar = save_path
 
-    # 3. 将上传的文件保存到指定路径
-    with open(save_path, "wb") as buffer:
-        buffer.write(await avatar.read())  # 异步读取文件并写入到本地文件中
-    return
+    async with aiofiles.open(save_path, "wb") as buffer:
+        await buffer.write(await avatar.read())
+    await user_exist.save()
+
+    return {"data": "修改头像成功"}
 
 
 @user.put("/", description="修改用户信息")

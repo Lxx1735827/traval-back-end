@@ -7,6 +7,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `name` VARCHAR(20) NOT NULL  COMMENT '景点名字',
     `city` VARCHAR(20) NOT NULL  COMMENT '城市',
+    `description` VARCHAR(1000) NOT NULL  COMMENT '景点描述',
     `picture` VARCHAR(40) NOT NULL  COMMENT '景点图片' DEFAULT 'static/site/默认图片.png',
     `location` VARCHAR(40) NOT NULL  COMMENT '景点地址',
     `longitude` DECIMAL(9,6) NOT NULL  COMMENT '经度',
@@ -18,6 +19,12 @@ CREATE TABLE IF NOT EXISTS `user` (
     `username` VARCHAR(20) NOT NULL  COMMENT '用户名' DEFAULT 'username',
     `password` VARCHAR(11) NOT NULL  COMMENT '密码',
     `avatar` VARCHAR(255) NOT NULL  COMMENT '头像' DEFAULT 'static/site/默认头像.png'
+) CHARACTER SET utf8mb4;
+CREATE TABLE IF NOT EXISTS `conversation` (
+    `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `content` VARCHAR(10000) NOT NULL  COMMENT '历史对话',
+    `user_id` INT,
+    CONSTRAINT `fk_conversa_user_84883661` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL
 ) CHARACTER SET utf8mb4;
 CREATE TABLE IF NOT EXISTS `strategy` (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,

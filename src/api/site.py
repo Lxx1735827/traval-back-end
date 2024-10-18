@@ -6,8 +6,15 @@ site = APIRouter()
 
 @site.get('/', description="获得所有地点")
 async def get_sites():
+    # 获取所有景点
     sites = await Site.all()
-    return {"sites": sites}
+
+    # 序列化景点数据，选择需要返回的字段
+    site_list = [{"id": one_site.id, "name": one_site.name, "city": one_site.city, "description": one_site.description,
+                  "picture": one_site.picture, "location": one_site.location, "longitude": one_site.longitude,
+                  "latitude": one_site.latitude} for one_site in sites]
+
+    return {"sites": site_list}
 
 
 @site.post('/', description='添加景点')
@@ -57,7 +64,22 @@ async def user_sites(user_number: str):
     return {"data": site_list}
 
 
+@site.delete("/user-site", description="用户取消收藏")
+async def user_sites(user_number: str, site_id):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
 
+    # 查找景点是否存在
+    site_exist = await Site.get_or_none(id=site_id)
+    if site_exist is None:
+        raise HTTPException(status_code=400, detail="景点不存在")
+
+    # 删除收藏（无需解包 site_exist）
+    await user_exist.sites.remove(site_exist)
+
+    return {'data': "取消收藏成功"}
 
 
 
