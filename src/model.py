@@ -11,6 +11,7 @@ class User(Model):
     avatar = fields.CharField(max_length=255, description="头像", default="static/site/默认头像.png")
     sites = fields.ManyToManyField("models.Site", related_name="User", through="user_site",
                                    description="用户收藏的景点")
+    conversations = fields.ReverseRelation["Conversation"]
 
 
 class Strategy(Model):
@@ -30,6 +31,13 @@ class Site(Model):
     latitude = fields.DecimalField(max_digits=9, decimal_places=6, description="纬度", default=None)
     users = fields.ManyToManyField("models.User", related_name="Site", through="user_site",
                                    description="喜欢该景点的用户")
+
+
+class Conversation(Model):
+    id = fields.IntField(pk=True, max_length=11)
+    content = fields.CharField(max_length=10000, description="历史对话")
+    user = fields.ForeignKeyField("models.User", related_name="Conversation", on_delete=fields.SET_NULL, null=True)
+
 
 
 
