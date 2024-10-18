@@ -1,14 +1,13 @@
 import os
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
-from fastapi import HTTPException
 from src.schema import *
 
 user = APIRouter()
 
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
-async def get_user(user_number:str):
+async def get_user(user_number: str):
     user_exist = await User.get_or_none(number=user_number)
     if user_exist is not None:
         raise HTTPException(status_code=400, detail="User with this phone number already exists.")
