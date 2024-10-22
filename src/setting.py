@@ -10,3 +10,17 @@ TORTOISE_ORM = {
         },
     },
 }
+
+# 替换以下内容
+TOKEN = "W3CTo3RZ4BGv1D2RpwVwpNTmkVRLBoql"  # 您的 Bearer 令牌
+USERID = "lWdLGdyOUqWl"  # 您的用户 ID
+
+# 构造请求的 URL
+URL = 'https://yuanqi.tencent.com/openapi/v1/agent/chat/completions'
+
+# 构造请求头
+HEADERS = {
+    'X-Source': 'openapi',
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {TOKEN}',
+}

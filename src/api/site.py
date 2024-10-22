@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, HTTPException
 from src.schema import *
 
 site = APIRouter()
