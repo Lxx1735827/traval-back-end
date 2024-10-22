@@ -7,7 +7,7 @@ class User(Model):
     number = fields.CharField(max_length=11, description="电话号码")
     username = fields.CharField(max_length=20, description="用户名", default="username")
     password = fields.CharField(max_length=11, description="密码")
-    avatar = fields.CharField(max_length=255, description="头像", default="static/site/默认头像.png")
+    avatar = fields.CharField(max_length=255, description="头像", default="static/user/默认头像.png")
     sites = fields.ManyToManyField("models.Site", related_name="User", through="user_site",
                                    description="用户收藏的景点")
     conversations = fields.ReverseRelation["Conversation"]

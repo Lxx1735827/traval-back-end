@@ -52,15 +52,18 @@ async def update_avatar(number: str, avatar: UploadFile = File()):
     if user_exist is None:
         raise HTTPException(status_code=404, detail="该用户不存在")
 
-    save_directory = "static/user"  # 存放头像文件的目录
     file_extension = os.path.splitext(avatar.filename)[1]  # 获取文件的扩展名
-    save_path = os.path.join(save_directory, f"{number}{file_extension}")  # 例如: avatars/12345.jpg
+    save_path = f"static/user/{number}{file_extension}"  # 例如: avatars/12345.jpg
     user_exist.avatar = save_path
 
     async with aiofiles.open(save_path, "wb") as buffer:
         await buffer.write(await avatar.read())
     await user_exist.save()
-
+    user_data = {
+        "number": user_exist.number,
+        "username": user_exist.username,  # 假设你的 User 模型有一个 name 字段
+        "avatar": user_exist.avatar,  # 假设有 email 字段
+    }
     return {"data": "修改头像成功"}
 
 
