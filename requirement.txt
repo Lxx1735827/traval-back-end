@@ -5,3 +5,4 @@ aerich==0.7.2
 uvicorn==0.30.6
 python-multipart
 aiofiles
+spark_ai_python

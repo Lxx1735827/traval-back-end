@@ -1,6 +1,5 @@
 from tortoise import fields
 from tortoise.models import Model
-from tortoise.exceptions import ValidationError
 
 
 class User(Model):
@@ -36,7 +35,7 @@ class Site(Model):
 class Conversation(Model):
     id = fields.IntField(pk=True, max_length=11)
     content = fields.CharField(max_length=10000, description="历史对话")
-    user = fields.ForeignKeyField("models.User", related_name="Conversation", on_delete=fields.SET_NULL, null=True)
+    user = fields.ForeignKeyField("models.User", related_name="conversations", on_delete=fields.SET_NULL, null=True)
 
 
 
