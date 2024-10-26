@@ -64,7 +64,7 @@ async def update_avatar(number: str, avatar: UploadFile = File()):
         "username": user_exist.username,  # 假设你的 User 模型有一个 name 字段
         "avatar": user_exist.avatar,  # 假设有 email 字段
     }
-    return {"data": "修改头像成功"}
+    return {"data": user_data}
 
 
 @user.put("/", description="修改用户信息")
@@ -76,7 +76,6 @@ async def update_user(new_user: UserSchema):
         raise HTTPException(status_code=404, detail="User not found.")
     # 更新用户信息
     user_exist.password = new_user.password
-    user_exist.avatar = new_user.avatar
     user_exist.username = new_user.username
 
     # 保存更新
