@@ -42,7 +42,7 @@ async def completion(content: str, conversation: Conversation):
                         content = json_line.get('choices', [{}])[0].get('delta', {}).get('content', '')
                         if content:
                             contents += content
-                            yield content  # 使用 yield 返回内容
+                            yield content
         now = datetime.now()
         formatted_time = now.strftime('%Y-%m-%d %H-%M')
         contents = formatted_time + ":::" + "system" + ":::" + contents + ";;;"
