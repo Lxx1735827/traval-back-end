@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.setting import *
+from setting import *
 import uvicorn
 from src.api.user import user
 from src.api.site import site
@@ -12,6 +12,8 @@ app = FastAPI()
 app.include_router(user, prefix="/user", tags=["user"])
 app.include_router(site, prefix="/site", tags=["site"])
 app.include_router(ai, prefix="/ai", tags=["ai"])
+app.include_router(ai, prefix="/restaurant", tags=["restaurant"])
+app.include_router(ai, prefix="/review", tags=["review"])
 
 # 配置 CORS 中间件
 app.add_middleware(
@@ -34,4 +36,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
