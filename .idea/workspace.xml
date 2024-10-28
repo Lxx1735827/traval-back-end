@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="487c5448-f71c-4994-a377-7523e24992c5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/traval-back-end.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/traval-back-end.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/site/北京_故宫.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/site/北京_故宫.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/site/默认图片.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/site/默认图片.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/user/17320435827.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/user/17320435827.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/user/默认头像.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/user/默认头像.png" afterDir="false" />
-    </list>
+    <list default="true" id="487c5448-f71c-4994-a377-7523e24992c5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,16 +30,20 @@
     <option name="showMembers" value="true" />
     <option name="sortByType" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "D:/桌面/大三/计算机设计大赛/wmy/traval-back-end",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/桌面/大三/计算机设计大赛/wmy/traval-back-end&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\桌面\大三\计算机设计大赛\wmy\traval-back-end\src" />
+      <recent name="D:\桌面\大三\计算机设计大赛\wmy\traval-back-end" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\桌面\大三\计算机设计大赛\traval-back-end\src\static\user" />
       <recent name="D:\桌面\大三\计算机设计大赛\traval-back-end\src\static\site" />
