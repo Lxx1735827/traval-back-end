@@ -19,14 +19,7 @@ async def get_restaurants():
         "location": one_restaurant.location,
         "telephone": one_restaurant.telephone,
         "longitude": one_restaurant.longitude,
-        "latitude": one_restaurant.latitude,
-        "reviews": [
-            one_restaurant.review_1,
-            one_restaurant.review_2,
-            one_restaurant.review_3,
-            one_restaurant.review_4,
-            one_restaurant.review_5
-        ]
+        "latitude": one_restaurant.latitude
     } for one_restaurant in restaurants]
 
     return {"restaurants": restaurant_list}
@@ -43,14 +36,7 @@ async def get_restaurant_by_id(restaurant_id: int):
             "location": restaurant.location,
             "telephone": restaurant.telephone,
             "longitude": restaurant.longitude,
-            "latitude": restaurant.latitude,
-            "reviews": [
-                restaurant.review_1,
-                restaurant.review_2,
-                restaurant.review_3,
-                restaurant.review_4,
-                restaurant.review_5
-            ]
+            "latitude": restaurant.latitude
         }
         return {"data": restaurant_found}
     except DoesNotExist:

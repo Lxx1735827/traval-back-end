@@ -15,14 +15,7 @@ async def get_sites():
     site_list = [{"id": one_site.id, "name": one_site.name, "city": one_site.city, "description": one_site.description,
                   "picture": one_site.picture, "location": one_site.location, "telephone": one_site.telephone,
                   "time_reference": one_site.time_reference, "transport": one_site.transport, "ticket": one_site.ticket,
-                  "open_time": one_site.open_time, "longitude": one_site.longitude, "latitude": one_site.latitude,
-                  "reviews": [
-                      one_site.review_1,
-                      one_site.review_2,
-                      one_site.review_3,
-                      one_site.review_4,
-                      one_site.review_5
-                  ]
+                  "open_time": one_site.open_time, "longitude": one_site.longitude, "latitude": one_site.latitude
                   }for one_site in sites]
 
     return {"sites": site_list}
@@ -44,14 +37,7 @@ async def get_site_by_id(site_id: int):
             "ticket": site.ticket,
             "open_time": site.open_time,
             "longitude": site.longitude,
-            "latitude": site.latitude,
-            "reviews": [
-                site.review_1,
-                site.review_2,
-                site.review_3,
-                site.review_4,
-                site.review_5
-            ]
+            "latitude": site.latitude
         }
         return {"data": site_found}
     except DoesNotExist:
