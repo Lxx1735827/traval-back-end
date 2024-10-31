@@ -74,7 +74,6 @@ async def update_user(new_user: UserSchema):
         raise HTTPException(status_code=404, detail="User not found.")
     # 更新用户信息
     user_exist.password = new_user.password
-    user_exist.avatar = new_user.avatar
     user_exist.username = new_user.username
 
     # 保存更新
