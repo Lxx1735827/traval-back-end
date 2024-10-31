@@ -1,4 +1,6 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
+from pydantic import BaseModel
+
 from src.schema import *
 from tortoise.exceptions import DoesNotExist
 import math
@@ -59,7 +61,10 @@ async def get_site_by_id(site_id: int):
 
 
 @site.post('/map', description="获取地图中心附近的景点")
-async def map_near(longitude: float, latitude: float, scope: int):
+async def map_near(request: MapRequest):
+    longitude = request.longitude
+    latitude = request.latitude
+    scope = request.scope
     # 地球半径，单位为米
     EARTH_RADIUS = 6371000
 

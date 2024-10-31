@@ -131,3 +131,9 @@ async def get_review_of_user(user_id: int):
         },
         "reviews": review_list
     }
+
+@review.post("/add", description="用户添加评论")
+async def add_reiew(new_review: ReviewSchema):
+    # 插入数据库
+    await Review.create(**new_review.dict())
+    return {"data": "插入成功"}

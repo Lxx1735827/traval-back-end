@@ -56,8 +56,11 @@ async def get_restaurant_by_id(restaurant_id: int):
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
-@restaurant.post('/map', description="获取地图中心附近的餐厅")
-async def map_near(longitude: float, latitude: float, scope: int):
+@restaurant.post('/map', description="获取地图中心附近的景点")
+async def map_near(request: MapRequest):
+    longitude = request.longitude
+    latitude = request.latitude
+    scope = request.scope
     # 地球半径，单位为米
     EARTH_RADIUS = 6371000
 
