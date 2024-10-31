@@ -55,14 +55,14 @@ async def update_avatar(number: str, avatar: UploadFile = File()):
 
     save_directory = "static/user"  # 存放头像文件的目录
     file_extension = os.path.splitext(avatar.filename)[1]  # 获取文件的扩展名
-    save_path = os.path.join(save_directory, f"{number}{file_extension}")  # 例如: avatars/12345.jpg
+    save_path = save_directory+ f"/{number}{file_extension}"  # 例如: avatars/12345.jpg
     user_exist.avatar = save_path
 
     async with aiofiles.open(save_path, "wb") as buffer:
         await buffer.write(await avatar.read())
     await user_exist.save()
 
-    return {"data": "修改头像成功"}
+    return {"data": save_path}
 
 
 @user.put("/", description="修改用户信息")
