@@ -1,0 +1,116 @@
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/ssh_keys/\r\n/src/static/\r\n/migrations/\r\n/pyproject.toml\r\n/src/wmy/
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 3e7deb472375221b1ad7eaebd31efefd1c714615)
++++ b/.gitignore	(date 1730375532277)
+@@ -2,4 +2,3 @@
+ /src/static/
+ /migrations/
+ /pyproject.toml
+-/src/wmy/
+\ No newline at end of file
+Index: src/api/site.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from fastapi import APIRouter, File, UploadFile, HTTPException\r\nfrom src.schema import *\r\nfrom tortoise.exceptions import DoesNotExist\r\nimport math\r\n\r\nsite = APIRouter()\r\n\r\n\r\n@site.get('/', description=\"获得所有地点\")\r\nasync def get_sites():\r\n    # 获取所有景点\r\n    sites = await Site.all()\r\n\r\n    # 序列化景点数据，选择需要返回的字段\r\n    site_list = [{\"id\": one_site.id, \"name\": one_site.name, \"city\": one_site.city, \"description\": one_site.description,\r\n                  \"picture\": one_site.picture, \"location\": one_site.location, \"telephone\": one_site.telephone,\r\n                  \"time_reference\": one_site.time_reference, \"transport\": one_site.transport, \"ticket\": one_site.ticket,\r\n                  \"open_time\": one_site.open_time, \"longitude\": one_site.longitude, \"latitude\": one_site.latitude,\r\n                  \"reviews\": [\r\n                      one_site.review_1,\r\n                      one_site.review_2,\r\n                      one_site.review_3,\r\n                      one_site.review_4,\r\n                      one_site.review_5\r\n                  ]\r\n                  }for one_site in sites]\r\n\r\n    return {\"sites\": site_list}\r\n\r\n@site.get('/{site_id}', description=\"根据site的id获取site的所有信息\")\r\nasync def get_site_by_id(site_id: int):\r\n    try:\r\n        site = await Site.get(id=site_id)\r\n        site_found = {\r\n            \"id\": site.id,\r\n            \"name\": site.name,\r\n            \"city\": site.city,\r\n            \"description\": site.description,\r\n            \"picture\": site.picture,\r\n            \"location\": site.location,\r\n            \"telephone\": site.telephone,\r\n            \"time_reference\": site.time_reference,\r\n            \"transport\": site.transport,\r\n            \"ticket\": site.ticket,\r\n            \"open_time\": site.open_time,\r\n            \"longitude\": site.longitude,\r\n            \"latitude\": site.latitude,\r\n            \"reviews\": [\r\n                site.review_1,\r\n                site.review_2,\r\n                site.review_3,\r\n                site.review_4,\r\n                site.review_5\r\n            ]\r\n        }\r\n        return {\"data\": site_found}\r\n    except DoesNotExist:\r\n        raise HTTPException(status_code=404, detail=\"Site not found\")\r\n\r\n\r\n@site.post('/map', description=\"获取地图中心附近的景点\")\r\nasync def map_near(longitude: float, latitude: float, scope: int):\r\n    # 地球半径，单位为米\r\n    EARTH_RADIUS = 6371000\r\n\r\n    # 计算经度和纬度的变化量\r\n    delta_lat = scope / EARTH_RADIUS\r\n    delta_lon = scope / (EARTH_RADIUS * math.cos(math.pi * latitude / 180))\r\n\r\n    # 计算经纬度的范围\r\n    min_lat = latitude - (delta_lat * 180 / math.pi)\r\n    max_lat = latitude + (delta_lat * 180 / math.pi)\r\n    min_lon = longitude - (delta_lon * 180 / math.pi)\r\n    max_lon = longitude + (delta_lon * 180 / math.pi)\r\n\r\n    # 查询数据库中符合条件的site\r\n    sites = await Site.filter(\r\n        latitude__gte=min_lat,\r\n        latitude__lte=max_lat,\r\n        longitude__gte=min_lon,\r\n        longitude__lte=max_lon\r\n    ).values('id', 'name', 'longitude', 'latitude')\r\n\r\n    if not sites:\r\n        raise HTTPException(status_code=404, detail=\"No sites found in the specified range\")\r\n\r\n    return {\"data\": list(sites)}\r\n\r\n\r\n@site.post('/', description='添加景点')\r\nasync def add_site(new_site: SiteSchema):\r\n    # 查看是否已经存在\r\n    site_exist = await Site.get_or_none(name=new_site.name, city=new_site.city)\r\n    if site_exist is not None:\r\n        raise HTTPException(status_code=400, detail=\"Site with this name in this city already exists.\")\r\n\r\n    # 插入数据库\r\n    await Site.create(**new_site.dict())\r\n    return {\"data\": \"插入成功\"}\r\n\r\n\r\n@site.post('/user-site', description='用户收藏景点')\r\nasync def user_site(user_number: str, site_id: int):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number)\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 查找景点是否存在\r\n    site_exist = await Site.get_or_none(id=site_id)\r\n    if site_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"景点不存在\")\r\n\r\n    # 添加收藏（无需解包 site_exist）\r\n    await user_exist.sites.add(site_exist)\r\n\r\n    return {'data': \"收藏成功\"}\r\n\r\n\r\n@site.get('/{user_number}', description='得到用户的收藏列表')\r\nasync def user_sites(user_number: str):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 获取用户收藏的景点\r\n    sites = await user_exist.sites.all()\r\n\r\n    # 构造返回的数据结构\r\n    site_list = [{\"id\": new_site.id, \"name\": new_site.name, \"city\": new_site.city, \"location\": new_site.location,\r\n                  \"picture\": new_site.picture, \"longitude\": new_site.longitude, \"latitude\": new_site.latitude} for new_site in sites]\r\n\r\n    return {\"data\": site_list}\r\n\r\n\r\n@site.delete(\"/user-site\", description=\"用户取消收藏\")\r\nasync def user_sites(user_number: str, site_id):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number)\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 查找景点是否存在\r\n    site_exist = await Site.get_or_none(id=site_id)\r\n    if site_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"景点不存在\")\r\n\r\n    # 删除收藏（无需解包 site_exist）\r\n    await user_exist.sites.remove(site_exist)\r\n\r\n    return {'data': \"取消收藏成功\"}\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/api/site.py b/src/api/site.py
+--- a/src/api/site.py	(revision 3e7deb472375221b1ad7eaebd31efefd1c714615)
++++ b/src/api/site.py	(date 1730375532299)
+@@ -1,4 +1,6 @@
+ from fastapi import APIRouter, File, UploadFile, HTTPException
++from pydantic import BaseModel
++
+ from src.schema import *
+ from tortoise.exceptions import DoesNotExist
+ import math
+@@ -59,7 +61,10 @@
+ 
+ 
+ @site.post('/map', description="获取地图中心附近的景点")
+-async def map_near(longitude: float, latitude: float, scope: int):
++async def map_near(request: MapRequest):
++    longitude = request.longitude
++    latitude = request.latitude
++    scope = request.scope
+     # 地球半径，单位为米
+     EARTH_RADIUS = 6371000
+ 
+Index: src/api/review.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from fastapi import APIRouter, File, UploadFile, HTTPException\r\nfrom src.schema import *\r\nfrom tortoise.exceptions import DoesNotExist\r\n\r\nreview = APIRouter()\r\n\r\n\r\n@review.get('/all', description=\"获得所有评论\")\r\nasync def get_reviews():\r\n    # 获取所有评论\r\n    reviews = await Review.all()\r\n\r\n    # 序列化评论数据，选择需要返回的字段\r\n    review_list = [\r\n        {\r\n            \"id\": review.id,\r\n            \"entity_id\": review.entity_id,\r\n            \"entity_type\": review.entity_type,\r\n            \"user_id\": review.user_id,\r\n            \"content\": review.content,\r\n            \"created_at\": review.created_at.isoformat()  # 将日期时间转换为字符串\r\n        }\r\n        for review in reviews\r\n    ]\r\n\r\n    return {\"reviews\": review_list}\r\n\r\n\r\n@review.get('/{review_id2}', description=\"根据review的id获取review的所有信息\")\r\nasync def get_review_by_id(review_id: int):\r\n    try:\r\n        review = await Review.get(id=review_id)\r\n        review_found = {\r\n            \"id\": review.id,\r\n            \"entity_id\": review.entity_id,\r\n            \"entity_type\": review.entity_type,\r\n            \"user_id\": review.user_id,\r\n            \"content\": review.content,\r\n            \"created_at\": review.created_at.isoformat()  # 将日期时间转换为字符串\r\n        }\r\n        return {\"data\": review_found}\r\n    except DoesNotExist:\r\n        raise HTTPException(status_code=404, detail=\"Review not found\")\r\n\r\n\r\n@review.get('/site/{site_id}', description=\"根据site的id获取reviews\")\r\nasync def get_review_of_site(site_id: int):\r\n    site = await Site.get(id=site_id)\r\n\r\n    # 获取与指定 site_id 相关的所有评论\r\n    reviews = await Review.filter(entity_id=site_id, entity_type=\"景点\").all()\r\n\r\n    # 序列化评论数据，选择需要返回的字段\r\n    review_list = [\r\n        {\r\n            \"id\": review.id,\r\n            \"entity_id\": review.entity_id,\r\n            \"entity_type\": review.entity_type,\r\n            \"user_id\": review.user_id,\r\n            \"content\": review.content,\r\n            \"created_at\": review.created_at.isoformat()  # 将日期时间转换为字符串\r\n        }\r\n        for review in reviews\r\n    ]\r\n\r\n    return {\r\n        \"object\": {\r\n            \"type\": \"site\",\r\n            \"id\": site.id,\r\n            \"name\": site.name,\r\n            \"city\": site.city\r\n        },\r\n        \"reviews\": review_list\r\n    }\r\n\r\n\r\n@review.get('/restaurant/{restaurant_id}', description=\"根据restaurant的id获取reviews\")\r\nasync def get_review_of_restaurant(restaurant_id: int):\r\n    # 获取指定的餐厅信息\r\n    restaurant = await Restaurant.get(id=restaurant_id)\r\n\r\n    # 获取与指定 restaurant_id 相关的所有评论\r\n    reviews = await Review.filter(entity_id=restaurant_id, entity_type=\"餐厅\").all()\r\n\r\n    # 序列化评论数据，选择需要返回的字段\r\n    review_list = [\r\n        {\r\n            \"id\": review.id,\r\n            \"entity_id\": review.entity_id,\r\n            \"entity_type\": review.entity_type,\r\n            \"user_id\": review.user_id,\r\n            \"content\": review.content,\r\n            \"created_at\": review.created_at.isoformat()  # 将日期时间转换为字符串\r\n        }\r\n        for review in reviews\r\n    ]\r\n\r\n    return {\r\n        \"object\": {\r\n            \"type\": \"restaurant\",\r\n            \"id\": restaurant.id,\r\n            \"name\": restaurant.name,\r\n            \"city\": restaurant.city\r\n        },\r\n        \"reviews\": review_list\r\n    }\r\n\r\n\r\n@review.get('/user/{user_id}', description=\"根据user的id获取reviews\")\r\nasync def get_review_of_user(user_id: int):\r\n    # 获取与指定 user_id 相关的所有评论\r\n    reviews = await Review.filter(user_id=user_id).all()\r\n\r\n    # 序列化评论数据，选择需要返回的字段\r\n    review_list = [\r\n        {\r\n            \"id\": review.id,\r\n            \"entity_id\": review.entity_id,\r\n            \"entity_type\": review.entity_type,\r\n            \"user_id\": review.user_id,\r\n            \"content\": review.content,\r\n            \"created_at\": review.created_at.isoformat()  # 将日期时间转换为字符串\r\n        }\r\n        for review in reviews\r\n    ]\r\n\r\n    return {\r\n        \"object\": {\r\n            \"type\": \"user\",\r\n            \"id\": user_id,\r\n        },\r\n        \"reviews\": review_list\r\n    }\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/api/review.py b/src/api/review.py
+--- a/src/api/review.py	(revision 3e7deb472375221b1ad7eaebd31efefd1c714615)
++++ b/src/api/review.py	(date 1730375532298)
+@@ -131,3 +131,9 @@
+         },
+         "reviews": review_list
+     }
++
++@review.post("/add", description="用户添加评论")
++async def add_reiew(new_review: ReviewSchema):
++    # 插入数据库
++    await Review.create(**new_review.dict())
++    return {"data": "插入成功"}
+\ No newline at end of file
+Index: src/api/restaurant.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from fastapi import APIRouter, HTTPException\r\nfrom src.schema import *\r\nfrom tortoise.exceptions import DoesNotExist\r\nimport math\r\n\r\nrestaurant = APIRouter()\r\n\r\n@restaurant.get('/', description=\"获得所有餐厅\")\r\nasync def get_restaurants():\r\n    # 获取所有餐厅\r\n    restaurants = await Restaurant.all()\r\n\r\n    # 序列化餐厅数据，选择需要返回的字段\r\n    restaurant_list = [{\r\n        \"id\": one_restaurant.id,\r\n        \"name\": one_restaurant.name,\r\n        \"city\": one_restaurant.city,\r\n        \"image\": one_restaurant.image,\r\n        \"location\": one_restaurant.location,\r\n        \"telephone\": one_restaurant.telephone,\r\n        \"longitude\": one_restaurant.longitude,\r\n        \"latitude\": one_restaurant.latitude,\r\n        \"reviews\": [\r\n            one_restaurant.review_1,\r\n            one_restaurant.review_2,\r\n            one_restaurant.review_3,\r\n            one_restaurant.review_4,\r\n            one_restaurant.review_5\r\n        ]\r\n    } for one_restaurant in restaurants]\r\n\r\n    return {\"restaurants\": restaurant_list}\r\n\r\n@restaurant.get('/{restaurant_id}', description=\"根据restaurant的id获取restaurant的所有信息\")\r\nasync def get_restaurant_by_id(restaurant_id: int):\r\n    try:\r\n        restaurant = await Restaurant.get(id=restaurant_id)\r\n        restaurant_found = {\r\n            \"id\": restaurant.id,\r\n            \"name\": restaurant.name,\r\n            \"city\": restaurant.city,\r\n            \"image\": restaurant.image,\r\n            \"location\": restaurant.location,\r\n            \"telephone\": restaurant.telephone,\r\n            \"longitude\": restaurant.longitude,\r\n            \"latitude\": restaurant.latitude,\r\n            \"reviews\": [\r\n                restaurant.review_1,\r\n                restaurant.review_2,\r\n                restaurant.review_3,\r\n                restaurant.review_4,\r\n                restaurant.review_5\r\n            ]\r\n        }\r\n        return {\"data\": restaurant_found}\r\n    except DoesNotExist:\r\n        raise HTTPException(status_code=404, detail=\"Restaurant not found\")\r\n\r\n@restaurant.post('/map', description=\"获取地图中心附近的餐厅\")\r\nasync def map_near(longitude: float, latitude: float, scope: int):\r\n    # 地球半径，单位为米\r\n    EARTH_RADIUS = 6371000\r\n\r\n    # 计算经度和纬度的变化量\r\n    delta_lat = scope / EARTH_RADIUS\r\n    delta_lon = scope / (EARTH_RADIUS * math.cos(math.pi * latitude / 180))\r\n\r\n    # 计算经纬度的范围\r\n    min_lat = latitude - (delta_lat * 180 / math.pi)\r\n    max_lat = latitude + (delta_lat * 180 / math.pi)\r\n    min_lon = longitude - (delta_lon * 180 / math.pi)\r\n    max_lon = longitude + (delta_lon * 180 / math.pi)\r\n\r\n    # 查询数据库中符合条件的restaurant\r\n    restaurants = await Restaurant.filter(\r\n        latitude__gte=min_lat,\r\n        latitude__lte=max_lat,\r\n        longitude__gte=min_lon,\r\n        longitude__lte=max_lon\r\n    ).values('id', 'name', 'longitude', 'latitude')\r\n\r\n    if not restaurants:\r\n        raise HTTPException(status_code=404, detail=\"No restaurants found in the specified range\")\r\n\r\n    return {\"data\": list(restaurants)}\r\n\r\n@restaurant.post('/', description='添加餐厅')\r\nasync def add_restaurant(new_restaurant: RestaurantSchema):\r\n    # 查看是否已经存在\r\n    restaurant_exist = await Restaurant.get_or_none(name=new_restaurant.name, city=new_restaurant.city)\r\n    if restaurant_exist is not None:\r\n        raise HTTPException(status_code=400, detail=\"Restaurant with this name in this city already exists.\")\r\n\r\n    # 插入数据库\r\n    await Restaurant.create(**new_restaurant.dict())\r\n    return {\"data\": \"插入成功\"}\r\n\r\n@restaurant.post('/user-restaurant', description='用户收藏餐厅')\r\nasync def user_restaurant(user_number: str, restaurant_id: int):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number)\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 查找餐厅是否存在\r\n    restaurant_exist = await Restaurant.get_or_none(id=restaurant_id)\r\n    if restaurant_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"餐厅不存在\")\r\n\r\n    # 添加收藏（无需解包 restaurant_exist）\r\n    await user_exist.restaurants.add(restaurant_exist)\r\n\r\n    return {'data': \"收藏成功\"}\r\n\r\n@restaurant.get('/{user_number}', description='得到用户的收藏列表')\r\nasync def user_restaurants(user_number: str):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number).prefetch_related('restaurants')\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 获取用户收藏的餐厅\r\n    restaurants = await user_exist.restaurants.all()\r\n\r\n    # 构造返回的数据结构\r\n    restaurant_list = [{\r\n        \"id\": new_restaurant.id,\r\n        \"name\": new_restaurant.name,\r\n        \"city\": new_restaurant.city,\r\n        \"location\": new_restaurant.location,\r\n        \"image\": new_restaurant.image,\r\n        \"longitude\": new_restaurant.longitude,\r\n        \"latitude\": new_restaurant.latitude\r\n    } for new_restaurant in restaurants]\r\n\r\n    return {\"data\": restaurant_list}\r\n\r\n@restaurant.delete(\"/user-restaurant\", description=\"用户取消收藏\")\r\nasync def user_restaurant_remove(user_number: str, restaurant_id: int):\r\n    # 查找用户是否存在\r\n    user_exist = await User.get_or_none(number=user_number)\r\n    if user_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"用户不存在\")\r\n\r\n    # 查找餐厅是否存在\r\n    restaurant_exist = await Restaurant.get_or_none(id=restaurant_id)\r\n    if restaurant_exist is None:\r\n        raise HTTPException(status_code=400, detail=\"餐厅不存在\")\r\n\r\n    # 删除收藏（无需解包 restaurant_exist）\r\n    await user_exist.restaurants.remove(restaurant_exist)\r\n\r\n    return {'data': \"取消收藏成功\"}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/api/restaurant.py b/src/api/restaurant.py
+--- a/src/api/restaurant.py	(revision 3e7deb472375221b1ad7eaebd31efefd1c714615)
++++ b/src/api/restaurant.py	(date 1730375532295)
+@@ -56,8 +56,11 @@
+     except DoesNotExist:
+         raise HTTPException(status_code=404, detail="Restaurant not found")
+ 
+-@restaurant.post('/map', description="获取地图中心附近的餐厅")
+-async def map_near(longitude: float, latitude: float, scope: int):
++@restaurant.post('/map', description="获取地图中心附近的景点")
++async def map_near(request: MapRequest):
++    longitude = request.longitude
++    latitude = request.latitude
++    scope = request.scope
+     # 地球半径，单位为米
+     EARTH_RADIUS = 6371000
+ 
+Index: src/schema.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from tortoise.contrib.pydantic import pydantic_model_creator\r\nfrom src.model import *\r\n\r\nUserSchema = pydantic_model_creator(User, name=\"User\", exclude_readonly=True)\r\nSiteSchema = pydantic_model_creator(Site, name=\"Site\", exclude_readonly=True)\r\nRestaurantSchema = pydantic_model_creator(Restaurant, name=\"Restaurant\", exclude_readonly=True)\r\nConversationSchema = pydantic_model_creator(Conversation, name=\"Conversation\", exclude_readonly=True)\r\nReviewSchema = pydantic_model_creator(Review, name=\"Review\", exclude_readonly=True)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/schema.py b/src/schema.py
+--- a/src/schema.py	(revision 3e7deb472375221b1ad7eaebd31efefd1c714615)
++++ b/src/schema.py	(date 1730375532302)
+@@ -1,8 +1,15 @@
++from pydantic import BaseModel
+ from tortoise.contrib.pydantic import pydantic_model_creator
+ from src.model import *
+ 
++class MapRequest(BaseModel):
++    longitude: float
++    latitude: float
++    scope: int
++
+ UserSchema = pydantic_model_creator(User, name="User", exclude_readonly=True)
+ SiteSchema = pydantic_model_creator(Site, name="Site", exclude_readonly=True)
+ RestaurantSchema = pydantic_model_creator(Restaurant, name="Restaurant", exclude_readonly=True)
+ ConversationSchema = pydantic_model_creator(Conversation, name="Conversation", exclude_readonly=True)
+ ReviewSchema = pydantic_model_creator(Review, name="Review", exclude_readonly=True)
++# MapRequestSchema = pydantic_model_creator(MapRequest, name="MapRequest", exclude_readonly=True)
