@@ -26,7 +26,7 @@ async def get_reviews():
     return {"reviews": review_list}
 
 
-@review.get('/{review_id}', description="根据review的id获取review的所有信息")
+@review.get('/{review_id2}', description="根据review的id获取review的所有信息")
 async def get_review_by_id(review_id: int):
     try:
         review = await Review.get(id=review_id)
