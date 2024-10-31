@@ -4,6 +4,8 @@ import uvicorn
 from src.api.user import user
 from src.api.site import site
 from src.api.ai import ai
+from src.api.restaurant import restaurant
+from src.api.review import review
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
@@ -12,8 +14,8 @@ app = FastAPI()
 app.include_router(user, prefix="/user", tags=["user"])
 app.include_router(site, prefix="/site", tags=["site"])
 app.include_router(ai, prefix="/ai", tags=["ai"])
-app.include_router(ai, prefix="/restaurant", tags=["restaurant"])
-app.include_router(ai, prefix="/review", tags=["review"])
+app.include_router(restaurant, prefix="/restaurant", tags=["restaurant"])
+app.include_router(review, prefix="/review", tags=["review"])
 
 # 配置 CORS 中间件
 app.add_middleware(
