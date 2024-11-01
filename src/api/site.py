@@ -103,7 +103,7 @@ async def user_site(user_number: str, site_id: int):
     return {'data': "收藏成功"}
 
 
-@site.get('/{user_number}', description='得到用户的收藏列表')
+@site.get('/user/{user_number}', description='得到用户的收藏列表')
 async def user_sites(user_number: str):
     # 查找用户是否存在
     user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')
