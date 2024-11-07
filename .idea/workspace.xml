@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4abd5e30-4df2-4738-bc15-95d6369122a5" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/user/121.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/user/121.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/review.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/review.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +30,7 @@
     "Python.main.executor": "Run",
     "Python.site.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "lxx"
+    "git-widget-placeholder": "正在合并 lxx"
   }
 }]]></component>
   <component name="SharedIndexes">
@@ -52,5 +50,16 @@
       <updated>1730376425354</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
