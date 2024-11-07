@@ -11,8 +11,8 @@ user = APIRouter()
 @user.get("/{user_number}", description="得到一个用户的所有信息")
 async def get_user(user_number: str):
     user_exist = await User.get_or_none(number=user_number)
-    if user_exist is not None:
-        raise HTTPException(status_code=400, detail="User with this phone number already exists.")
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
     return {"data": user_exist}
 
 
