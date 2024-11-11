@@ -147,3 +147,14 @@ async def add_review(review_data: ReviewSchema):
     )
 
     return {"message": "评论添加成功", "review_id": review_instance.id}
+
+@review.delete("/delete/{review_id}", description="删除评论")
+async def delete_review(review_id: int):
+    review = await Review.filter(id=review_id).first()
+
+    if review is None:
+        return {"message": "该评论不存在（已删除）"}
+
+    await review.delete()
+
+    return {"message": "评论删除成功"}

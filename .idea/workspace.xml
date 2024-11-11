@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4abd5e30-4df2-4738-bc15-95d6369122a5" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/src.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/review.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/review.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,9 +27,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Python.main.executor": "Run",
+    "Python.model.executor": "Run",
     "Python.site.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "正在合并 lxx"
+    "git-widget-placeholder": "lxx"
   }
 }]]></component>
   <component name="SharedIndexes">
