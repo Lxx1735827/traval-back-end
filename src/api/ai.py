@@ -87,7 +87,7 @@ async def delete_one(conversation_id: int):
     return {"data": "对话已删除"}
 
 
-@ai.get("/{entity_id}", description="获取视频")
+@ai.get("/video/{entity_id}", description="获取视频")
 async def get_one(entity_id: int):
     # 获取该用户的所有对话
     video = await Video.filter(entity_id=entity_id).all()
