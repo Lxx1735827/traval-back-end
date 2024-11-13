@@ -1,9 +1,12 @@
+import math
+import json
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from src.utils.aiutils import *
+from src.api.site import map_near
 
 ai = APIRouter()
 
@@ -67,6 +70,7 @@ async def get_video(entity_id: int):
 
     return {"data": video[0].video}
 
+
 @ai.get("/user/{conversation_id}", description="获取用户指定对话")
 async def get_one(conversation_id: int):
     # 获取该用户的所有对话
@@ -79,6 +83,41 @@ async def get_one(conversation_id: int):
     conversation_data = {"id": conversations[0].id, "content": conversations[0].content}
 
     return {"data": conversation_data}
+
+
+@ai.post("/site", description="景点推荐")
+async def site_recommand(longitude: float, latitude: float, scope: int):
+    # 获取当前时间
+    now = datetime.now()
+    # 地球半径，单位为米
+    EARTH_RADIUS = 6371000
+
+    # 计算经度和纬度的变化量
+    delta_lat = scope / EARTH_RADIUS
+    delta_lon = scope / (EARTH_RADIUS * math.cos(math.pi * latitude / 180))
+
+    # 计算经纬度的范围
+    min_lat = latitude - (delta_lat * 180 / math.pi)
+    max_lat = latitude + (delta_lat * 180 / math.pi)
+    min_lon = longitude - (delta_lon * 180 / math.pi)
+    max_lon = longitude + (delta_lon * 180 / math.pi)
+
+    # 查询数据库中符合条件的site
+    sites = await Site.filter(
+        latitude__gte=min_lat,
+        latitude__lte=max_lat,
+        longitude__gte=min_lon,
+        longitude__lte=max_lon
+    ).values('id', 'name', 'longitude', 'latitude')
+
+    if not sites:
+        raise HTTPException(status_code=404, detail="No sites found in the specified range")
+
+    prompt = f"当前时间为：{now}，请从以下景点推荐一个富含传统文化的景点{list(sites)}, 返回一个数组，第一个元素是景点id,第二个是推荐原因，不输出其他内容"
+
+    content = json.loads(completion2(prompt))
+    return {"id": content[0], "reason": content[1]}
+
 
 
 @ai.delete("/user/{conversation_id}", description="删除对话")
