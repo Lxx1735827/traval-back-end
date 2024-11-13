@@ -70,6 +70,7 @@ class Conversation(Model):
     content = fields.CharField(max_length=10000, description="历史对话")
     user = fields.ForeignKeyField("models.User", related_name="Conversation", on_delete=fields.SET_NULL, null=True)
 
+
 class Review(Model):
     id = fields.IntField(pk=True, max_length=12)
     entity_id = fields.IntField(description="景点或餐厅ID")  # 合并为同一列
@@ -77,6 +78,7 @@ class Review(Model):
     user_id = fields.IntField(description="用户ID")
     content = fields.TextField(description="评论内容", null=True)
     created_at = fields.DatetimeField(default=datetime.utcnow, description="记录时间")  # 添加记录时间属性
+
 
 class Video(Model):
     id = fields.IntField(pk=True, max_length=12)
