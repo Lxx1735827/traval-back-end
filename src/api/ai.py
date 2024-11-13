@@ -116,10 +116,14 @@ async def site_recommand(longitude: float, latitude: float, scope: int):
     prompt = f"当前时间为：{now}，请从以下景点推荐一个富含传统文化的景点{list(sites)}, 只返回景点id"
 
     content = (int)(completion2(prompt))
-    site = await Site.filter(
+    site = await Site.get_or_none(
         id=content
     )
-    contents = completion2("给出推荐传统景点为这个景点的原因"+ str(list(site)))
+
+    if site is None:
+        raise HTTPException(status_code=404, detail="错误")
+
+    contents = completion2("给出推荐传统景点为这个景点的原因" + site.name + site.description + site.city)
 
     return {"id": content, "reason": contents}
 
