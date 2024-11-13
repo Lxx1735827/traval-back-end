@@ -56,6 +56,16 @@ async def complete_conversation(content: str, conversation_id: int):
 
     return StreamingResponse(completion(conversation.content, conversation), media_type='text/plain')
 
+@ai.get("/video/{entity_id}", description="获取视频")
+async def get_one(entity_id: int):
+    # 获取该用户的所有对话
+    video = await Video.filter(entity_id=entity_id).all()
+
+    # 如果对话为空，可以返回一个提示
+    if not video:
+        return {"data": "static/video/默认视频.mp4"}
+
+    return {"data": video[0].video}
 
 @ai.get("/user/{conversation_id}", description="获取用户指定对话")
 async def get_one(conversation_id: int):
@@ -86,14 +96,3 @@ async def delete_one(conversation_id: int):
     # 返回确认删除的信息
     return {"data": "对话已删除"}
 
-
-@ai.get("/video/{entity_id}", description="获取视频")
-async def get_one(entity_id: int):
-    # 获取该用户的所有对话
-    video = await Video.filter(entity_id=entity_id).all()
-
-    # 如果对话为空，可以返回一个提示
-    if not video:
-        return {"data": "static/video/默认视频.mp4"}
-
-    return {"data": video[0].video}
