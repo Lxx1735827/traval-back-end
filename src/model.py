@@ -78,6 +78,9 @@ class Review(Model):
     content = fields.TextField(description="评论内容", null=True)
     created_at = fields.DatetimeField(default=datetime.utcnow, description="记录时间")  # 添加记录时间属性
 
-
+class Video(Model):
+    id = fields.IntField(pk=True, max_length=12)
+    entity_id = fields.IntField(description="景点或餐厅ID")  # 合并为同一列
+    video = fields.CharField(max_length=100, description="视频地址", default="static/video/默认视频.mp4")
 
 
