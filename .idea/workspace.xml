@@ -7,7 +7,6 @@
     <list default="true" id="4abd5e30-4df2-4738-bc15-95d6369122a5" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/api/ai.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/ai.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/aiutils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/aiutils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +104,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/api/ai.py</url>
-          <line>89</line>
+          <line>90</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

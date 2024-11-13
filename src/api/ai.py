@@ -113,10 +113,15 @@ async def site_recommand(longitude: float, latitude: float, scope: int):
     if not sites:
         raise HTTPException(status_code=404, detail="No sites found in the specified range")
 
-    prompt = f"当前时间为：{now}，请从以下景点推荐一个富含传统文化的景点{list(sites)}, 返回一个数组，第一个元素是景点id,第二个是推荐原因，不输出其他内容"
+    prompt = f"当前时间为：{now}，请从以下景点推荐一个富含传统文化的景点{list(sites)}, 只返回景点id"
 
-    content = json.loads(completion2(prompt))
-    return {"id": content[0], "reason": content[1]}
+    content = (int)(completion2(prompt))
+    site = await Site.filter(
+        id=content
+    )
+    contents = completion2("给出推荐传统景点为这个景点的原因"+ str(list(site)))
+
+    return {"id": content, "reason": contents}
 
 
 
