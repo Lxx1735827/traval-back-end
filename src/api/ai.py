@@ -57,7 +57,7 @@ async def complete_conversation(content: str, conversation_id: int):
     return StreamingResponse(completion(conversation.content, conversation), media_type='text/plain')
 
 @ai.get("/video/{entity_id}", description="获取视频")
-async def get_one(entity_id: int):
+async def get_video(entity_id: int):
     # 获取该用户的所有对话
     video = await Video.filter(entity_id=entity_id).all()
 
