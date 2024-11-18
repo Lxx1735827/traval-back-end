@@ -23,22 +23,24 @@ async def get_sites():
 @site.get('/{site_id}', description="根据site的id获取site的所有信息")
 async def get_site_by_id(site_id: int):
     try:
-        site = await Site.get(id=site_id)
+        print(1)
+        sites = await Site.get(id=site_id)
         site_found = {
-            "id": site.id,
-            "name": site.name,
-            "city": site.city,
-            "description": site.description,
-            "picture": site.picture,
-            "location": site.location,
-            "telephone": site.telephone,
-            "time_reference": site.time_reference,
-            "transport": site.transport,
-            "ticket": site.ticket,
-            "open_time": site.open_time,
-            "longitude": site.longitude,
-            "latitude": site.latitude
+            "id": sites.id,
+            "name": sites.name,
+            "city": sites.city,
+            "description": sites.description,
+            "picture": sites.picture,
+            "location": sites.location,
+            "telephone": sites.telephone,
+            "time_reference": sites.time_reference,
+            "transport": sites.transport,
+            "ticket": sites.ticket,
+            "open_time": sites.open_time,
+            "longitude": sites.longitude,
+            "latitude": sites.latitude
         }
+        print(2)
         return {"data": site_found}
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Site not found")

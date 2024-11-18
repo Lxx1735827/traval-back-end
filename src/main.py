@@ -9,6 +9,7 @@ from src.api.review import review
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
 app.include_router(user, prefix="/user", tags=["user"])
@@ -16,6 +17,29 @@ app.include_router(site, prefix="/site", tags=["site"])
 app.include_router(ai, prefix="/ai", tags=["ai"])
 app.include_router(restaurant, prefix="/restaurant", tags=["restaurant"])
 app.include_router(review, prefix="/review", tags=["review"])
+
+# 定义一个继承自BaseHTTPMiddleware的自定义中间件类
+class CustomMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        print("Before request - CustomMiddleware")
+        print(f"Request URL: {request.url}")
+        print(f"Client IP: {request.client.host}")
+        print(f"Request headers: {request.headers}")
+        response = await call_next(request)
+        print("After request - CustomMiddleware")
+        return response
+
+# 使用装饰器定义一个中间件函数
+@app.middleware("http")
+async def custom_middleware(request, call_next):
+    print("Before request - custom_middleware decorator")
+    print(f"Request URL: {request.url}")
+    print(f"Client IP: {request.client.host}")
+    print(f"Request headers: {request.headers}")
+    response = await call_next(request)
+    print("After request - custom_middleware decorator")
+    return response
+
 
 # 配置 CORS 中间件
 app.add_middleware(
@@ -35,6 +59,7 @@ register_tortoise(
 )
 # 将 static 目录中的文件作为静态文件提供
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.add_middleware(CustomMiddleware)
 
 
 if __name__ == "__main__":
