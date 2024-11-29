@@ -139,5 +139,17 @@ async def user_sites(user_number: str, site_id):
 
     return {'data': "取消收藏成功"}
 
+@site.get("/search/{key}", description="搜索景点名字，返回最相似的")
+async def search_site(key: str):
+    try:
+        sites = await Site.filter(name__icontains=key).limit(7)  # 使用first()取最匹配的记录
+        if not sites:
+            raise HTTPException(status_code=404, detail="Site not found")
+
+        result = [{"id": site.id, "name": site.name} for site in sites]
+        return {"data": result}
+
+    except DoesNotExist:
+        raise HTTPException(status_code=404, detail="Site not found")
 
 

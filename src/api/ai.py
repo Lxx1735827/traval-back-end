@@ -125,7 +125,8 @@ async def site_recommand(longitude: float, latitude: float, scope: int):
 
     contents = completion2("给出推荐传统景点为这个景点的原因" + site.name + site.description + site.city)
 
-    return {"id": content, "reason": contents}
+    data = {"id": content, "reason": contents}
+    return {"data": data}
 
 
 

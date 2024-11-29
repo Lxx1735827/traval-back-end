@@ -137,3 +137,15 @@ async def user_restaurant_remove(user_number: str, restaurant_id: int):
     await user_exist.restaurants.remove(restaurant_exist)
 
     return {'data': "取消收藏成功"}
+
+@restaurant.get("/search/{key}", description="搜索餐厅名字，返回最相似的")
+async def search_site(key: str):
+    try:
+        restaurants = await Restaurant.filter(name__icontains=key).limit(7)  # 使用first()取最匹配的记录
+        if not restaurants:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        result = [{"id": restaurant.id, "name": restaurant.name} for restaurant in restaurants]
+        return {"data": result}
+
+    except DoesNotExist:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
