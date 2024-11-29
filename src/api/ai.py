@@ -1,11 +1,13 @@
 import math
-import json
-from datetime import datetime
+import os
+import aiofiles
+import re
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse
 
 from src.utils.aiutils import *
+from src.utils.aiutils2 import *
 from src.api.site import map_near
 
 ai = APIRouter()
@@ -58,6 +60,30 @@ async def complete_conversation(content: str, conversation_id: int):
     await conversation.save()
 
     return StreamingResponse(completion(conversation.content, conversation), media_type='text/plain')
+@ai.post("/completion/image", description="完成包含图片的对话")
+async def complete_conversation(conversation_id: int, picture: UploadFile = File(), content: str = "这张图片讲了什么",):
+    # 格式化当前时间
+    now = datetime.now()
+    formatted_time = now.strftime('%Y-%m-%d %H:%M')
+    safe_file_name = re.sub(r'[<>:"/\\|?*]', '_', formatted_time)
+
+    save_directory = "static/conversation"  # 存放头像文件的目录
+    file_extension = os.path.splitext(picture.filename)[1]  # 获取文件的扩展名
+    save_path = save_directory + f"/{safe_file_name}{file_extension}"
+    print(save_path)
+    async with aiofiles.open(save_path, "wb") as buffer:
+        await buffer.write(await picture.read())
+    content = formatted_time + ":::" + "user" + ":::" + f"[{content}]" +f"[{save_path}]"+ ";;;"
+
+    # 查找现有对话记录
+    conversation = await Conversation.filter(id=conversation_id).first()
+    if conversation is None:
+        raise HTTPException(status_code=404, detail="该对话不存在")
+
+    # 更新对话内容，添加用户的输入
+    conversation.content += content
+    await conversation.save()
+    return StreamingResponse(send_request(save_path, conversation.content, conversation), media_type='text/plain')
 
 @ai.get("/video/{entity_id}", description="获取视频")
 async def get_video(entity_id: int):
