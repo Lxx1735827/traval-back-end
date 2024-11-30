@@ -14,6 +14,9 @@ class User(Model):
     conversations = fields.ReverseRelation["Conversation"]
     restaurants = fields.ManyToManyField("models.Restaurant", related_name="User", through="user_restaurant",
                                    description="用户收藏的餐厅")
+    visit_sites = fields.ManyToManyField("models.Site", related_name="visit_user", through="user_visit_site",
+                                   description="用户访问过的的景点")
+
 
 class Strategy(Model):
     id = fields.IntField(pk=True, max_length=11)
@@ -37,6 +40,8 @@ class Site(Model):
     latitude = fields.DecimalField(max_digits=9, decimal_places=6, description="纬度", default=None)
     users = fields.ManyToManyField("models.User", related_name="Site", through="user_site",
                                    description="喜欢该景点的用户")
+    visit_users = fields.ManyToManyField("models.User", related_name="visit_site", through="user_visit_site",
+                                   description="访问过该景点的用户")
     # review_1 = fields.TextField(description="景点评论", null=True)
     # review_2 = fields.TextField(description="景点评论", null=True)
     # review_3 = fields.TextField(description="景点评论", null=True)
@@ -85,4 +90,9 @@ class Video(Model):
     entity_id = fields.IntField(description="景点或餐厅ID")  # 合并为同一列
     video = fields.CharField(max_length=100, description="视频地址", default="static/video/默认视频.mp4")
 
+
+class SiteRelationship(Model):
+    relate_id = fields.IntField(pk=True, max_length=11)
+    site_from_ids = fields.CharField(max_length=2000)
+    site_to_ids = fields.CharField(max_length=2000)
 

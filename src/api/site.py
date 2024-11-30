@@ -1,7 +1,10 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
-from src.schema import *
+from fastapi import APIRouter, HTTPException
 from tortoise.exceptions import DoesNotExist
+from src.utils.aprioriutils import *
+from src.setting import *
 import math
+import random
+import time
 
 site = APIRouter()
 
@@ -122,6 +125,37 @@ async def user_sites(user_number: str):
     return {"data": site_list}
 
 
+@site.get('/user/recommend/{user_number}', description='推荐算法')
+async def user_recommend_sites(user_number: str):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+    sites = await user_exist.sites.all()
+    site_ids1 = [site_it.id for site_it in sites]
+    sites = await user_exist.sites.all()
+    site_ids2 = [site_it.id for site_it in sites]
+    sites = list(set(site_ids1).union(set(site_ids2)))
+    random.seed(time.time())
+    random.shuffle(sites)
+    site_lists = set()
+    for site_id in sites:
+        return_sites = await SiteRelationship.filter(site_from_ids__icontains=site_id).values("site_to_ids")
+        print(return_sites)
+        for return_site in return_sites:
+            site_list = return_site["site_to_ids"].split("*")[:-1]
+            site_list = set(site_list)
+            site_lists = site_lists.union(site_list)
+            if len(site_lists) > 7:
+                break
+    print(site_lists)
+    for i in range(len(site_lists)-1, 7):
+        site_lists.add(SITE[i])
+    site_lists = [int(site_) for site_ in site_lists]
+
+    return {"data": site_lists}
+
+
 @site.delete("/user-site", description="用户取消收藏")
 async def user_sites(user_number: str, site_id):
     # 查找用户是否存在
@@ -139,6 +173,7 @@ async def user_sites(user_number: str, site_id):
 
     return {'data': "取消收藏成功"}
 
+
 @site.get("/search/{key}", description="搜索景点名字，返回最相似的")
 async def search_site(key: str):
     try:
@@ -153,3 +188,8 @@ async def search_site(key: str):
         raise HTTPException(status_code=404, detail="Site not found")
 
 
+@site.get("/timer/{key}", description="搜索景点名字，返回最相似的")
+async def search_site(key: int):
+    if key == 10:
+        await insert_data()
+    return {"data": "成功"}

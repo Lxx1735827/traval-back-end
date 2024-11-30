@@ -18,26 +18,17 @@ app.include_router(ai, prefix="/ai", tags=["ai"])
 app.include_router(restaurant, prefix="/restaurant", tags=["restaurant"])
 app.include_router(review, prefix="/review", tags=["review"])
 
+
 # 定义一个继承自BaseHTTPMiddleware的自定义中间件类
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        print("Before request - CustomMiddleware")
-        print(f"Request URL: {request.url}")
-        print(f"Client IP: {request.client.host}")
-        print(f"Request headers: {request.headers}")
         response = await call_next(request)
-        print("After request - CustomMiddleware")
         return response
 
 # 使用装饰器定义一个中间件函数
 @app.middleware("http")
 async def custom_middleware(request, call_next):
-    print("Before request - custom_middleware decorator")
-    print(f"Request URL: {request.url}")
-    print(f"Client IP: {request.client.host}")
-    print(f"Request headers: {request.headers}")
     response = await call_next(request)
-    print("After request - custom_middleware decorator")
     return response
 
 
