@@ -1,17 +1,6 @@
 from src.schema import *
 import copy
 import itertools
-import logging
-
-# 配置日志
-logging.basicConfig(
-    level=logging.DEBUG,  # 设置日志级别
-    format='%(asctime)s - %(levelname)s - %(message)s',  # 日志格式
-    handlers=[
-        logging.FileHandler("app.log"),  # 输出到文件
-        logging.StreamHandler()  # 同时输出到控制台
-    ]
-)
 
 Min_Sup = 0.2
 Min_Conf = 1.5
@@ -28,7 +17,6 @@ async def load_data():
         site_ids2 = [site.id for site in sites]
         user_sites = tuple(set(site_ids1).union(set(site_ids2)))
         sites_all_users.append(user_sites)
-    logging.info(sites_all_users)
     return sites_all_users
 
 
