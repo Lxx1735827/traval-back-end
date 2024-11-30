@@ -16,7 +16,8 @@ async def load_data():
         sites = await user.sites.all()
         site_ids2 = [site.id for site in sites]
         user_sites = tuple(set(site_ids1).union(set(site_ids2)))
-        sites_all_users.append(user_sites)
+        if len(user_sites) > 0:
+            sites_all_users.append(user_sites)
     return sites_all_users
 
 

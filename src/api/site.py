@@ -141,14 +141,12 @@ async def user_recommend_sites(user_number: str):
     site_lists = set()
     for site_id in sites:
         return_sites = await SiteRelationship.filter(site_from_ids__icontains=site_id).values("site_to_ids")
-        print(return_sites)
         for return_site in return_sites:
             site_list = return_site["site_to_ids"].split("*")[:-1]
             site_list = set(site_list)
             site_lists = site_lists.union(site_list)
             if len(site_lists) > 7:
                 break
-    print(site_lists)
     for i in range(len(site_lists)-1, 7):
         site_lists.add(SITE[i])
     site_lists = [int(site_) for site_ in site_lists]

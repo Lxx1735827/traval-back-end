@@ -48,7 +48,7 @@ async def complete_conversation(content: str, conversation_id: int):
     # 格式化当前时间
     now = datetime.now()
     formatted_time = now.strftime('%Y-%m-%d %H:%M')
-    content = formatted_time + ":::" + "user" + ":::" + content + ";;;"  # 构造用户输入的记录格式
+    content = formatted_time + ":::" + "user" + ":::" + f"[{content}]" + ";;;"  # 构造用户输入的记录格式
 
     # 查找现有对话记录
     conversation = await Conversation.filter(id=conversation_id).first()
