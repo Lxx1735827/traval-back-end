@@ -2,11 +2,14 @@ from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
 from tortoise.exceptions import DoesNotExist
 import math
+import random
+import time
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 from scipy.linalg import norm
 import re
 from tortoise import Tortoise
+from src.setting import SITE
 
 # LLM调用
 from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
@@ -223,6 +226,38 @@ def semantic_split(key: str):
     print(f"Keywords:{keywords}")
     result = [item.strip() for item in keywords.split(',')]
     return result
+
+@site.get('/user/recommend/{user_number}', description='推荐算法')
+async def user_recommend_sites(user_number: str):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+    sites = await user_exist.sites.all()
+    site_ids1 = [site_it.id for site_it in sites]
+    sites = await user_exist.sites.all()
+    site_ids2 = [site_it.id for site_it in sites]
+    sites = list(set(site_ids1).union(set(site_ids2)))
+    random.seed(time.time())
+    random.shuffle(sites)
+    site_lists = set()
+    for site_id in sites:
+        return_sites = await SiteRelationship.filter(site_from_ids__icontains=site_id).values("site_to_ids")
+        for return_site in return_sites:
+            site_list = return_site["site_to_ids"].split("*")[:-1]
+            site_list = set(site_list)
+            site_lists = site_lists.union(site_list)
+            if len(site_lists) > 7:
+                break
+    for i in range(len(site_lists) - 1, 7):
+        site_lists.add(SITE[i])
+    site_lists = [int(site_) for site_ in site_lists]
+    site_lists = await Site.filter(id__in=site_lists)
+    site_list = [{"id": new_site.id, "name": new_site.name,
+                  "picture": new_site.picture, "location": new_site.location} for
+                 new_site in site_lists]
+
+    return {"data": site_list}
 
 def tf_similarity(s1, s2):
     def add_space(s):
