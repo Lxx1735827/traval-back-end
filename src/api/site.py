@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 from scipy.linalg import norm
 import re
+import regex
 from tortoise import Tortoise
 from src.setting import SITE
 
@@ -85,7 +86,7 @@ async def map_near(longitude: float, latitude: float, scope: int):
         latitude__lte=max_lat,
         longitude__gte=min_lon,
         longitude__lte=max_lon
-    ).values('id', 'name', 'longitude', 'latitude')
+    ).values('id', 'name', 'longitude', 'latitude', 'picture', 'location')
 
     if not sites:
         raise HTTPException(status_code=404, detail="No sites found in the specified range")
@@ -170,7 +171,7 @@ async def search_site(key: str):
             raise HTTPException(status_code=404, detail="Site not found")
         real_sites = sites[1]
         # filtered_sites = [site for site in real_sites if site['description'] != '暂无介绍']
-        result = [{"id": site["id"], "name": site["name"]} for site in real_sites[:7]]
+        result = [{"id": site["id"], "name": site["name"], "location": site["location"],  "picture": site["picture"]} for site in real_sites[:7]]
 
         return {"data": result}
 
@@ -178,22 +179,26 @@ async def search_site(key: str):
         raise HTTPException(status_code=404, detail="Site not found")
 
 @site.get("/largesearch/{key}", description="搜索景点名字，返回最相似的")
-async def search_site(key: str):
+async def search_site_large(key: str):
     try:
         keywords = semantic_split(key)
-        rough = []
-        for keyword in keywords:
-            temp = await Site.filter(name__icontains=keyword)
-            rough.extend(temp)
-        unique_rough = list({site.id: site for site in rough}.values())
+        if not isinstance(keywords,list):
+            result = await search_site(key)
+            return result
+        else:
+            rough = []
+            for keyword in keywords:
+                temp = await Site.filter(name__icontains=keyword)
+                rough.extend(temp)
+            unique_rough = list({site.id: site for site in rough}.values())
 
-        similarities = [(site, tf_similarity(site.name, key)) for site in unique_rough]
+            similarities = [(site, tf_similarity(site.name, key)) for site in unique_rough]
 
-        # 按相似度从大到小排序
-        sorted_sites = [{"id":site.id, "name": site.name, "picture": site.picture, "location": site.location} for site, _ in sorted(similarities, key=lambda x: x[1], reverse=True)]
+            # 按相似度从大到小排序
+            sorted_sites = [{"id":site.id, "name": site.name, "picture": site.picture, "location": site.location} for site, _ in sorted(similarities, key=lambda x: x[1], reverse=True)]
 
-        # 限制返回最多35个site
-        return {"data": sorted_sites[:35]}
+            # 限制返回最多35个site
+            return {"data": sorted_sites[:35]}
 
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Site not found")
@@ -213,18 +218,23 @@ def semantic_split(key: str):
         ChatMessage(
             role="user",
             content=f"将搜索词'{key}'拆分成有意义的最小单元，保留核心名词或短语，并尽量涵盖整体及子层次的含义。"
-                    f"输出格式为：'keywords: xxx, xxx, xxx'。例如："
-                    f"1. '成都大熊猫基地'拆分为'成都, 熊猫, 基地'；"
-                    f"2. '四川大学江安校区'拆分为'四川大学, 江安校区, 四川, 大学, 江安'。"
+                    f"(必须严格按照此格式输出)输出格式为：'keywords: xxx, xxx, xxx'。例如："
+                    f"1. 'keywords: 成都, 熊猫, 基地'"
+                    f"2. 'keywords: 四川大学, 江安校区, 四川, 大学, 江安'"
         )
     ]
     handler = ChunkPrintHandler()
     a = spark.generate([messages], callbacks=[handler])
-    # 获取包含 city 和 keywords 的文本
-    text = a.generations[0][0].text  # 从数据中提取文本
-    keywords = text.strip("'").replace('keywords:', '').strip()
-    print(f"Keywords:{keywords}")
-    result = [item.strip() for item in keywords.split(',')]
+    text = a.generations[0][0].text.strip("'")  # 从数据中提取文本
+    print(text)
+    pattern = r'^\s*keywords:\s*([\p{L}\d_]+(?:\s*,\s*[\p{L}\d_]+)*)\s*$'
+    if regex.match(pattern, text):
+        keywords = text.replace('keywords:', '').strip()
+        print(f"Yes!Keywords:{keywords}")
+        result = [item.strip() for item in keywords.split(',')]
+    else:
+        print(f"No~Key:{key}")
+        result = key
     return result
 
 @site.get('/user/recommend/{user_number}', description='推荐算法')

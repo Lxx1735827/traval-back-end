@@ -16,6 +16,7 @@ class User(Model):
                                    description="用户收藏的餐厅")
     visit_sites = fields.ManyToManyField("models.Site", related_name="visit_user", through="user_visit_site",
                                    description="用户访问过的的景点")
+    is_shown = fields.IntField(description="标识", default=1)
 
 
 class Strategy(Model):

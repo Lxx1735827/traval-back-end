@@ -43,6 +43,7 @@ async def login_user(new_user: UserSchema):
         "number": user_exist.number,
         "username": user_exist.username,  # 假设你的 User 模型有一个 name 字段
         "avatar": user_exist.avatar,  # 假设有 email 字段
+        "is_shown": user_exist.is_shown
     }
     return {"data": user_data}
 
