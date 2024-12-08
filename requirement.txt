@@ -6,3 +6,5 @@ uvicorn==0.30.6
 python-multipart
 aiofiles
 spark_ai_python
+aliyun-python-sdk-core
+regex

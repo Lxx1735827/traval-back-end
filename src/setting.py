@@ -33,3 +33,10 @@ ACCESS_KEY_ID = os.getenv("ACCESS_KEY_ID")
 ACCESS_KEY_SECRET = os.getenv("ACCESS_KEY_SECRET")
 SIGN_NAME = '云游名胜'  # 短信签名
 template_code = 'SMS_475920736' #短信模板CODE
+
+WALKURL = "https://restapi.amap.com/v5/direction/walking"
+BUSURL = "https://restapi.amap.com/v3/direction/transit/integrated"
+CARURL = "https://restapi.amap.com/v3/direction/driving"
+BIKEURL = "https://restapi.amap.com/v4/direction/bicycling"
+
+GAODEKEY = os.getenv("GAODEKEY")
