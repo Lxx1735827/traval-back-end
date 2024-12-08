@@ -63,7 +63,7 @@ async def map_near(longitude: float, latitude: float, scope: int):
         latitude__lte=max_lat,
         longitude__gte=min_lon,
         longitude__lte=max_lon
-    ).values('id', 'name', 'longitude', 'latitude', 'location', 'image')
+    ).values('id', 'name', 'longitude', 'latitude', 'location', 'image', "telephone")
 
     if not restaurants:
         raise HTTPException(status_code=404, detail="No restaurants found in the specified range")

@@ -1,3 +1,5 @@
+import os
+
 TORTOISE_ORM = {
     "connections": {
         # 使用 aiomysql 连接 MySQL
@@ -26,3 +28,8 @@ HEADERS = {
 }
 
 SITE = ["1", "2", "3", "4", "5", "6", "7"]
+
+ACCESS_KEY_ID = os.getenv("ACCESS_KEY_ID")
+ACCESS_KEY_SECRET = os.getenv("ACCESS_KEY_SECRET")
+SIGN_NAME = '云游名胜'  # 短信签名
+template_code = 'SMS_475920736' #短信模板CODE
