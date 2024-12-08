@@ -8,7 +8,7 @@ SiteSchema = pydantic_model_creator(Site, name="Site", exclude_readonly=True)
 RestaurantSchema = pydantic_model_creator(Restaurant, name="Restaurant", exclude_readonly=True)
 ConversationSchema = pydantic_model_creator(Conversation, name="Conversation", exclude_readonly=True)
 ReviewSchema = pydantic_model_creator(Review, name="Review", exclude_readonly=True)
-
+TextSchema = pydantic_model_creator(Text, name="Text", exclude_readonly=True)
 
 class Point(BaseModel):
     name: str

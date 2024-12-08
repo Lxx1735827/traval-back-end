@@ -18,6 +18,10 @@ class User(Model):
                                    description="用户访问过的的景点")
     is_shown = fields.IntField(description="标识", default=1)
 
+class Text(Model):
+    id = fields.IntField(pk=True, max_length=11)
+    phonenumber = fields.CharField(max_length=11, description="电话号码")
+    code = fields.CharField(max_length=6, description="短信验证码 ")
 
 class Strategy(Model):
     id = fields.IntField(pk=True, max_length=11)

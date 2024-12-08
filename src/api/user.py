@@ -1,22 +1,15 @@
-import os
 import aiofiles
-
+from src.utils.codeutils import *
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
 from src.setting import *
-
-from aliyunsdkcore.client import AcsClient
-from aliyunsdkcore.request import CommonRequest
-import random
-import json
-
-
 
 user = APIRouter()
 
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
 async def get_user(user_number: str):
+    print("get_user")
     user_exist = await User.get_or_none(number=user_number)
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
@@ -89,48 +82,33 @@ async def update_user(new_user: UserSchema):
     return {"data": "用户信息更新成功"}
 
 
-def generate_verification_code(length=6):
-    return ''.join(random.choices('0123456789', k=length))
-@user.get("/phone_verification/{phonenumer}", description="手机号获取短信验证码")
-async def login_by_phone(phonenumer: str):
+@user.get("/code_send/{phonenumber}", description="手机号获取短信验证码")
+async def send_code(phonenumber: str):
+    print("send_code")
+    code = await code_sender(phonenumber)
 
-    user_exist = await User.get_or_none(number=phonenumer)
-    if user_exist is None:
-        raise HTTPException(status_code=404, detail="该用户不存在")
+    phone_exist = await Text.get_or_none(phonenumber=phonenumber)
+    if phone_exist is None:
+        await Text.create(phonenumber=phonenumber, code=code)
+    else:
+        phone_exist.code = code
+        await phone_exist.save()
 
-    user_data = {
-        "number": user_exist.number,
-        "username": user_exist.username,  # 假设你的 User 模型有一个 name 字段
-        "avatar": user_exist.avatar,  # 假设有 email 字段
-        "is_shown": user_exist.is_shown
-    }
+    return {"data": {"code": code}}
 
-    PhoneNumber = phonenumer
-    code = generate_verification_code(6)
-    acs_client = AcsClient(ACCESS_KEY_ID, ACCESS_KEY_SECRET, template_code)
 
-    # 创建CommonRequest实例
-    request = CommonRequest()
+@user.post("/code_verify", description="验证手机号的验证码")
+async def verify_code(phonenumber: str, code: str):
+    # 查询数据库中的记录
+    phone_exist = await Text.get_or_none(phonenumber=phonenumber)
 
-    # 设置请求参数,下面这5行其实不用动
-    request.set_accept_format('json')  # 设置API响应格式的方法
-    request.set_domain('dysmsapi.aliyuncs.com')  # 设置API的域名的方法
-    request.set_method('POST')  # 设置API请求方法
-    request.set_version('2017-05-25')  # 设置API版本号
-    request.set_action_name('SendSms')  # 设置API操作名
+    if phone_exist is None:
+        # 如果手机号不存在
+        raise HTTPException(status_code=404, detail="Have never sent code text to this phone.")
 
-    # 设置短信模板参数
-    request.add_query_param('PhoneNumbers', PhoneNumber)
-    request.add_query_param('SignName', SIGN_NAME)
-    request.add_query_param('TemplateCode', template_code)
-    # request.add_query_param('TemplateParam', '{"code":"123456"}')
-    template_param = {"code": code}
-    request.add_query_param('TemplateParam', json.dumps(template_param))
-    # 发送短信请求并获取返回结果
-    response = acs_client.do_action_with_exception(request)
-
-    print(response)
-
-    return {"data": {"code": code, "user": user_data}}
-
+    # 验证验证码是否正确
+    if phone_exist.code == code:
+        return {"data": "true"}
+    else:
+        return {"data": "false"}
 
