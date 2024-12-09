@@ -112,3 +112,13 @@ async def verify_code(phonenumber: str, code: str):
     else:
         return {"data": "false"}
 
+@user.delete("/delete_user", description="删除用户")
+async def delete_user(phonenumber: str):
+    # 查询数据库中的记录
+    phone_exist = await User.get_or_none(number=phonenumber)
+
+    if phone_exist is None:
+        # 如果手机号不存在
+        raise HTTPException(status_code=404, detail="用户不存在")
+    await phone_exist.delete()
+    return {"data": "删除成功"}
