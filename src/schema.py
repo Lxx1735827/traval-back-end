@@ -12,8 +12,8 @@ TextSchema = pydantic_model_creator(Text, name="Text", exclude_readonly=True)
 
 class Point(BaseModel):
     name: str
-    longitude: condecimal(max_digits=9, decimal_places=6)
     latitude: condecimal(max_digits=9, decimal_places=6)
+    longitude: condecimal(max_digits=9, decimal_places=6)
 
 
 class NewSiteSchema(BaseModel):
