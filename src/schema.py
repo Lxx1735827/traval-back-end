@@ -21,8 +21,8 @@ class NewSiteSchema(BaseModel):
     name: str
     location: str
     picture: str
-    longitude: condecimal(max_digits=9, decimal_places=6)
     latitude: condecimal(max_digits=9, decimal_places=6)
+    longitude: condecimal(max_digits=9, decimal_places=6)
 
 
 class DayRouteSchema(BaseModel):
