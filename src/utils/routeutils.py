@@ -2,7 +2,9 @@ import requests
 import heapq
 import sys
 import math
+import time
 from src.setting import *
+from src.accesskey import *
 from fastapi import HTTPException
 
 
@@ -166,6 +168,7 @@ def calculate(city_list: list):
     times = []
     ways = []
     for i in range(1, len(city_list)):
+        time.sleep(1)
         if calculate_distance(city_list[i]["latitude"], city_list[i]["longitude"], city_list[i-1]["latitude"], city_list[i-1]["longitude"]) < 1:
             respond = get_walk_time(city_list[i-1], city_list[i])
             ways.append(0)

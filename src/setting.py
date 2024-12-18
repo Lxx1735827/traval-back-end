@@ -36,5 +36,3 @@ WALKURL = "https://restapi.amap.com/v5/direction/walking"
 BUSURL = "https://restapi.amap.com/v3/direction/transit/integrated"
 CARURL = "https://restapi.amap.com/v3/direction/driving"
 BIKEURL = "https://restapi.amap.com/v4/direction/bicycling"
-
-GAODEKEY = os.getenv("GAODEKEY")
