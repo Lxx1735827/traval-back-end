@@ -25,7 +25,7 @@ class Text(Model):
 
 class Strategy(Model):
     id = fields.IntField(pk=True, max_length=11)
-    strategy = fields.CharField(max_length=2048, description="攻略，日期加地点")
+    strategy = fields.TextField(description="攻略，日期加地点")
     user = fields.ForeignKeyField("models.User", related_name="strategy", on_delete=fields.SET_NULL, null=True)
 
 
