@@ -6,3 +6,4 @@
 /.idea/
 /src.zip
 /src/accesskey.py
+src/__pycache__/
