@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 from src.schema import *
 from src.utils.routeutils import *
 
@@ -43,4 +43,20 @@ async def create_routes(routes: List[DayRouteSchema]):
            "id": id_
         }
         datas.append(data)
+
     return {"datas": datas}
+
+
+@route.post("/picture", description="生成图片")
+async def create_picture(pictures: List[UploadFile], info: str):
+    return {"data": "成功"}
+
+
+@route.post("/save", description="保存路径")
+async def save_route(user_id: str, info: str):
+    user = await User.get_or_none(number=user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    strategy = await Strategy.create(strategy=info, user=user)
+    return {"data": "成功"}

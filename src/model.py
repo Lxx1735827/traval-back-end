@@ -3,6 +3,7 @@ from tortoise.models import Model
 from tortoise.exceptions import ValidationError
 from datetime import datetime
 
+
 class User(Model):
     id = fields.IntField(pk=True, max_length=11)
     number = fields.CharField(max_length=11, description="电话号码")
@@ -18,10 +19,12 @@ class User(Model):
                                    description="用户访问过的的景点")
     is_shown = fields.IntField(description="标识", default=1)
 
+
 class Text(Model):
     id = fields.IntField(pk=True, max_length=11)
     phonenumber = fields.CharField(max_length=11, description="电话号码")
     code = fields.CharField(max_length=6, description="短信验证码 ")
+
 
 class Strategy(Model):
     id = fields.IntField(pk=True, max_length=11)
@@ -54,6 +57,7 @@ class Site(Model):
     # review_5 = fields.TextField(description="景点评论", null=True)
 
     type = fields.CharField(max_length=50, description="对象类型", default="景点")  # 添加type属性
+
 
 class Restaurant(Model):
     id = fields.IntField(pk=True, max_length=11)
