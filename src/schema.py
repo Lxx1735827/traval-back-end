@@ -1,5 +1,5 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
-from pydantic import BaseModel, condecimal
+from pydantic import BaseModel, condecimal, confloat
 from typing import List
 from src.model import *
 
@@ -29,3 +29,20 @@ class DayRouteSchema(BaseModel):
     start_point: Point
     end_point: Point
     sites: List[NewSiteSchema]
+
+class TransactionSchema(BaseModel):
+    author: UserSchema #author_name
+    content: str
+    timestamp: float #The time at which the content was created
+
+class PeerSchema(BaseModel):
+    node_address: str
+    node_port: str
+
+class BlockSchema(BaseModel):
+    index: int
+    transactions: List[TransactionSchema]
+    timestamp: float
+    previous_hash: str
+    nonce: int
+    hash: str

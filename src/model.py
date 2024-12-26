@@ -18,6 +18,7 @@ class User(Model):
     visit_sites = fields.ManyToManyField("models.Site", related_name="visit_user", through="user_visit_site",
                                    description="用户访问过的的景点")
     is_shown = fields.IntField(description="标识", default=1)
+    strategy = fields.ReverseRelation["Strategy"]
 
 
 class Text(Model):
@@ -29,6 +30,7 @@ class Text(Model):
 class Strategy(Model):
     id = fields.IntField(pk=True, max_length=11)
     strategy = fields.TextField(description="攻略，日期加地点")
+    name = fields.CharField(max_length=11, description="名字", default="旅游攻略")
     user = fields.ForeignKeyField("models.User", related_name="strategy", on_delete=fields.SET_NULL, null=True)
 
 

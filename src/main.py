@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
+import src.api.blockchain
 
 app = FastAPI()
 app.include_router(user, prefix="/user", tags=["user"])
