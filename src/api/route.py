@@ -3,6 +3,7 @@ from src.schema import *
 from src.utils.pictureutils import day_routes
 from src.utils.routeutils import *
 from datetime import datetime
+import json
 import os
 
 route = APIRouter()
@@ -75,9 +76,8 @@ async def save_route(user_id: str, info: str, name: str):
     user = await User.get_or_none(number=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="用户不存在")
-
-    await Strategy.create(strategy=info, user=user, name=name)
-    return {"data": "成功"}
+    strategy =  await Strategy.create(strategy=info, user=user, name=name)
+    return {"data": strategy.id}
 
 
 @route.get("/{user_id}", description="得到用户的所有规划")
@@ -86,7 +86,11 @@ async def get_routes(user_id: str):
     if user is None:
         raise HTTPException(status_code=404, detail="用户不存在")
     strategies = await user.strategy.all()  # 使用 related_name 查询该用户的所有策略
-    data = [{"strategy_id": strategy.id, "strategy_name": strategy.name} for strategy in strategies]
+    data = []
+    for strategy in strategies:
+        user = await User.get_or_none(id=strategy.user_id)
+
+        data.append({"strategy_id": strategy.id, "strategy_name": strategy.name, "user_name": user.username})
 
     # 返回数据
     return {"data": data}
@@ -98,9 +102,9 @@ async def get_routes(route_id: int):
         raise HTTPException(status_code=404, detail="规划不存在")
 
     # 返回数据
-    return {"data": strategy.strategy}
+    return {"data": json.loads(strategy.strategy)}
 
-@route.delete("/route_id}", description="删除一个规划")
+@route.delete("/{route_id}", description="删除一个规划")
 async def delete_route(route_id: int):
     strategy = await Strategy.get_or_none(id=route_id)
     if strategy is None:

@@ -132,7 +132,7 @@ async def get_review_of_user(user_id: int):
         "reviews": review_list
     }
 
-@review.post('/add', description="添加评论（景点/餐厅id+[景点/餐厅]+用户id）")
+@review.post('/add', description="添加评论（景点/餐厅id+[景点/餐厅]+用户number）")
 async def add_review(review_data: ReviewSchema):
     # 检查并设置 created_at 字段，使用请求中的时间或当前 UTC 时间
     created_at = review_data.created_at if review_data.created_at else datetime.utcnow()
@@ -141,7 +141,7 @@ async def add_review(review_data: ReviewSchema):
     review_instance = await Review.create(
         entity_id=review_data.entity_id,
         entity_type=review_data.entity_type,
-        user_id=review_data.user_id,
+        user_number=review_data.user_number,
         content=review_data.content,
         created_at=created_at
     )
