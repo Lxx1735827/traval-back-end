@@ -91,7 +91,7 @@ class Review(Model):
     id = fields.IntField(pk=True, max_length=12)
     entity_id = fields.IntField(description="景点或餐厅ID")  # 合并为同一列
     entity_type = fields.CharField(max_length=50, description="类型", choices=["景点", "餐厅"])  # 区分类型
-    user_number = fields.BigIntField(description="用户phonenumber")
+    user_number = fields.CharField(max_length=11, description="电话号码")
     content = fields.TextField(description="评论内容", null=True)
     created_at = fields.DatetimeField(default=datetime.utcnow, description="记录时间")  # 添加记录时间属性
 

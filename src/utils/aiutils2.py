@@ -1,10 +1,10 @@
 import json
 import base64
 import hmac
+import ssl
 import asyncio
 from urllib.parse import urlparse
 import hashlib
-from datetime import datetime
 from time import mktime
 from wsgiref.handlers import format_date_time
 from urllib.parse import urlencode
@@ -104,9 +104,14 @@ async def send_request(image_path, question, conversation: Conversation):
     # 获取图像的 base64 编码
     image_base64 = image_to_base64(image_path)
     payload = build_payload(image_base64, question)
+    websocket.enableTrace(True)
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+    ssl_context.verify_mode = ssl.CERT_NONE
+
+    ws = websocket.WebSocket(sslopt={"cert_reqs": ssl.CERT_NONE})
 
     wsParam = Ws_Param(appid, APIKey, APISecret, imageunderstanding_url)
-    ws = websocket.create_connection(wsParam.create_url())
+    ws.connect(wsParam.create_url(), ssl_context=ssl_context)
 
     # 发送数据
     ws.send(payload)
