@@ -16,7 +16,7 @@ async def get_reviews():
             "id": review.id,
             "entity_id": review.entity_id,
             "entity_type": review.entity_type,
-            "user_id": review.user_id,
+            "user_number": review.user_number,
             "content": review.content,
             "created_at": review.created_at.isoformat()  # 将日期时间转换为字符串
         }
@@ -34,7 +34,7 @@ async def get_review_by_id(review_id: int):
             "id": review.id,
             "entity_id": review.entity_id,
             "entity_type": review.entity_type,
-            "user_id": review.user_id,
+            "user_number": review.user_number,
             "content": review.content,
             "created_at": review.created_at.isoformat()  # 将日期时间转换为字符串
         }
@@ -56,7 +56,7 @@ async def get_review_of_site(site_id: int):
             "id": review.id,
             "entity_id": review.entity_id,
             "entity_type": review.entity_type,
-            "user_id": review.user_id,
+            "user_number": review.user_number,
             "content": review.content,
             "created_at": review.created_at.isoformat()  # 将日期时间转换为字符串
         }
@@ -88,7 +88,7 @@ async def get_review_of_restaurant(restaurant_id: int):
             "id": review.id,
             "entity_id": review.entity_id,
             "entity_type": review.entity_type,
-            "user_id": review.user_id,
+            "user_number": review.user_number,
             "content": review.content,
             "created_at": review.created_at.isoformat()  # 将日期时间转换为字符串
         }
@@ -106,10 +106,11 @@ async def get_review_of_restaurant(restaurant_id: int):
     }
 
 
-@review.get('/user/{user_id}', description="根据user的id获取reviews")
-async def get_review_of_user(user_id: int):
-    # 获取与指定 user_id 相关的所有评论
-    reviews = await Review.filter(user_id=user_id).all()
+@review.get('/user/{user_number}', description="根据user的phonenumber获取reviews")
+async def get_review_of_user(user_number: str):
+    # 获取与指定 user_number
+    # 相关的所有评论
+    reviews = await Review.filter(user_number=user_number).all()
 
     # 序列化评论数据，选择需要返回的字段
     review_list = [
@@ -117,7 +118,7 @@ async def get_review_of_user(user_id: int):
             "id": review.id,
             "entity_id": review.entity_id,
             "entity_type": review.entity_type,
-            "user_id": review.user_id,
+            "user_number": review.user_number,
             "content": review.content,
             "created_at": review.created_at.isoformat()  # 将日期时间转换为字符串
         }
@@ -127,7 +128,7 @@ async def get_review_of_user(user_id: int):
     return {
         "object": {
             "type": "user",
-            "id": user_id,
+            "id": user_number,
         },
         "reviews": review_list
     }
