@@ -250,4 +250,67 @@ async def user_recommend_sites(user_number: str):
 
     return {"data": site_list}
 
+@site.post('/user_check_site', description='用户打卡景点')
+async def user_check_site(user_number: str, site_id: int):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 查找景点是否存在
+    site_exist = await Site.get_or_none(id=site_id)
+    if site_exist is None:
+        raise HTTPException(status_code=400, detail="景点不存在")
+
+    # 添加收藏（无需解包 site_exist）
+    await user_exist.check_sites.add(site_exist)
+
+    tx_data = {
+        "content": f"User {user_number} checks in the site {site_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
+    return {'data': "收藏成功"}
+
+
+@site.get('/user_check/{user_number}', description='得到用户的景点打卡列表')
+async def user_check_sites(user_number: str):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 获取用户收藏的景点
+    sites = await user_exist.check_sites.all()
+
+    # 构造返回的数据结构
+    site_list = [{"id": new_site.id, "name": new_site.name, "city": new_site.city, "location": new_site.location,
+                  "picture": new_site.picture, "longitude": new_site.longitude, "latitude": new_site.latitude} for new_site in sites]
+
+    return {"data": site_list}
+
+
+@site.delete("/user_check_site", description="用户取消打卡景点")
+async def user_sites(user_number: str, site_id):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 查找景点是否存在
+    site_exist = await Site.get_or_none(id=site_id)
+    if site_exist is None:
+        raise HTTPException(status_code=400, detail="景点不存在")
+
+    # 删除收藏（无需解包 site_exist）
+    await user_exist.check_sites.remove(site_exist)
+
+    tx_data = {
+        "content": f"User {user_number} cancels the checking-in of the site {site_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
+    return {'data': "取消打卡成功"}
 

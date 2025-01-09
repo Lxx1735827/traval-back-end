@@ -10,13 +10,12 @@ class User(Model):
     username = fields.CharField(max_length=20, description="用户名", default="username")
     password = fields.CharField(max_length=11, description="密码")
     avatar = fields.CharField(max_length=255, description="头像", default="static/user/默认头像.png")
-    sites = fields.ManyToManyField("models.Site", related_name="User", through="user_site",
-                                   description="用户收藏的景点")
+    sites = fields.ManyToManyField("models.Site", related_name="User", through="user_site", description="用户收藏的景点")
     conversations = fields.ReverseRelation["Conversation"]
-    restaurants = fields.ManyToManyField("models.Restaurant", related_name="User", through="user_restaurant",
-                                   description="用户收藏的餐厅")
-    visit_sites = fields.ManyToManyField("models.Site", related_name="visit_user", through="user_visit_site",
-                                   description="用户访问过的的景点")
+    restaurants = fields.ManyToManyField("models.Restaurant", related_name="User", through="user_restaurant", description="用户收藏的餐厅")
+    visit_sites = fields.ManyToManyField("models.Site", related_name="visit_user", through="user_visit_site", description="用户访问过的的景点")
+    check_sites = fields.ManyToManyField("models.Site", related_name="check_site_user", through="user_check_site", description="用户打卡的景点")
+    check_restaurants = fields.ManyToManyField("models.Restaurant", related_name="check_restaurant_user", through="user_check_restaurant", description="用户打卡的餐厅")
     is_shown = fields.IntField(description="标识", default=1)
     strategy = fields.ReverseRelation["Strategy"]
 
@@ -52,6 +51,8 @@ class Site(Model):
                                    description="喜欢该景点的用户")
     visit_users = fields.ManyToManyField("models.User", related_name="visit_site", through="user_visit_site",
                                    description="访问过该景点的用户")
+    check_users = fields.ManyToManyField("models.User", related_name="check_site", through="user_check_site",
+                                   description="打卡过该景点的用户")
     # review_1 = fields.TextField(description="景点评论", null=True)
     # review_2 = fields.TextField(description="景点评论", null=True)
     # review_3 = fields.TextField(description="景点评论", null=True)
@@ -72,6 +73,8 @@ class Restaurant(Model):
     latitude = fields.DecimalField(max_digits=9, decimal_places=6, description="纬度", default=None)
     users = fields.ManyToManyField("models.User", related_name="Restaurant", through="user_restaurant",
                                    description="喜欢该餐厅的用户")
+    check_users = fields.ManyToManyField("models.User", related_name="check_restaurant", through="user_check_restaurant",
+                                   description="打卡过该餐厅的用户")
     # review_1 = fields.TextField(description="餐厅评论", null=True)
     # review_2 = fields.TextField(description="餐厅评论", null=True)
     # review_3 = fields.TextField(description="餐厅评论", null=True)

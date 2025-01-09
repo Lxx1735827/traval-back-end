@@ -124,7 +124,7 @@ async def user_restaurant(user_number: str, restaurant_id: int):
 
     return {'data': "收藏成功"}
 
-@restaurant.get('/{user_number}', description='得到用户的收藏列表')
+@restaurant.get('/user/{user_number}', description='得到用户的收藏列表')
 async def user_restaurants(user_number: str):
     # 查找用户是否存在
     user_exist = await User.get_or_none(number=user_number).prefetch_related('restaurants')
@@ -181,3 +181,72 @@ async def search_site(key: str):
 
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Restaurant not found")
+
+@restaurant.post('/user_check_restaurant', description='用户打卡餐厅')
+async def user_check_restaurant(user_number: str, restaurant_id: int):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 查找餐厅是否存在
+    restaurant_exist = await Restaurant.get_or_none(id=restaurant_id)
+    if restaurant_exist is None:
+        raise HTTPException(status_code=400, detail="餐厅不存在")
+
+    # 添加收藏（无需解包 restaurant_exist）
+    await user_exist.check_restaurants.add(restaurant_exist)
+
+    tx_data = {
+        "content": f"User {user_number} checks in the restaurant {restaurant_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
+    return {'data': "收藏成功"}
+
+@restaurant.get('/user_check/{user_number}', description='得到用户的餐厅打卡列表')
+async def user_restaurants(user_number: str):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number).prefetch_related('restaurants')
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 获取用户收藏的餐厅
+    restaurants = await user_exist.check_restaurants.all()
+
+    # 构造返回的数据结构
+    restaurant_list = [{
+        "id": new_restaurant.id,
+        "name": new_restaurant.name,
+        "city": new_restaurant.city,
+        "location": new_restaurant.location,
+        "image": new_restaurant.image,
+        "longitude": new_restaurant.longitude,
+        "latitude": new_restaurant.latitude
+    } for new_restaurant in restaurants]
+
+    return {"data": restaurant_list}
+
+@restaurant.delete("/user_check_restaurant", description="用户取消打卡餐厅")
+async def user_restaurant_remove(user_number: str, restaurant_id: int):
+    # 查找用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=400, detail="用户不存在")
+
+    # 查找餐厅是否存在
+    restaurant_exist = await Restaurant.get_or_none(id=restaurant_id)
+    if restaurant_exist is None:
+        raise HTTPException(status_code=400, detail="餐厅不存在")
+
+    # 删除收藏（无需解包 restaurant_exist）
+    await user_exist.check_restaurants.remove(restaurant_exist)
+
+    tx_data = {
+        "content": f"User {user_number} cancels the checking-in of the restaurant {restaurant_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
+    return {'data': "取消收藏成功"}
