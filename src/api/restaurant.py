@@ -2,8 +2,21 @@ from fastapi import APIRouter, HTTPException
 from src.schema import *
 from tortoise.exceptions import DoesNotExist
 import math
+import requests
+import time
 
+bc_url = "http://localhost:8000/bc"
+# host 1
 restaurant = APIRouter()
+
+async def add_transaction_to_blockchain(tx_data: dict):
+    """向区块链提交交易数据"""
+    try:
+        response = requests.post(f"{bc_url}/new_transaction", json=tx_data)
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to add transaction to blockchain")
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail="Error connecting to blockchain API")
 
 @restaurant.get('/', description="获得所有餐厅")
 async def get_restaurants():
@@ -79,6 +92,13 @@ async def add_restaurant(new_restaurant: RestaurantSchema):
 
     # 插入数据库
     await Restaurant.create(**new_restaurant.dict())
+
+    tx_data = {
+        "content": f"New restaurant {new_restaurant.name} is added to database.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
     return {"data": "插入成功"}
 
 @restaurant.post('/user-restaurant', description='用户收藏餐厅')
@@ -95,6 +115,12 @@ async def user_restaurant(user_number: str, restaurant_id: int):
 
     # 添加收藏（无需解包 restaurant_exist）
     await user_exist.restaurants.add(restaurant_exist)
+
+    tx_data = {
+        "content": f"User {user_number} bookmarks the restaurant {restaurant_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
 
     return {'data': "收藏成功"}
 
@@ -135,6 +161,12 @@ async def user_restaurant_remove(user_number: str, restaurant_id: int):
 
     # 删除收藏（无需解包 restaurant_exist）
     await user_exist.restaurants.remove(restaurant_exist)
+
+    tx_data = {
+        "content": f"User {user_number} cancels the bookmark of the restaurant {restaurant_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
 
     return {'data': "取消收藏成功"}
 

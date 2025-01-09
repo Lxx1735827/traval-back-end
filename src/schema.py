@@ -31,7 +31,6 @@ class DayRouteSchema(BaseModel):
     sites: List[NewSiteSchema]
 
 class TransactionSchema(BaseModel):
-    author: UserSchema #author_name
     content: str
     timestamp: float #The time at which the content was created
 

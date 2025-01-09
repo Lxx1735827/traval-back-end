@@ -8,8 +8,20 @@ import re
 from tortoise import Tortoise
 from src.setting import SITE
 from src.utils.searchutils import *
+import requests
 
+bc_url = "http://localhost:8000/bc"
+# host 1
 site = APIRouter()
+
+async def add_transaction_to_blockchain(tx_data: dict):
+    """向区块链提交交易数据"""
+    try:
+        response = requests.post(f"{bc_url}/new_transaction", json=tx_data)
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to add transaction to blockchain")
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail="Error connecting to blockchain API")
 
 @site.get('/', description="获得所有地点")
 async def get_sites():
@@ -87,6 +99,13 @@ async def add_site(new_site: SiteSchema):
 
     # 插入数据库
     await Site.create(**new_site.dict())
+
+    tx_data = {
+        "content": f"New site {new_site.name} is added to database.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
     return {"data": "插入成功"}
 
 
@@ -104,6 +123,12 @@ async def user_site(user_number: str, site_id: int):
 
     # 添加收藏（无需解包 site_exist）
     await user_exist.sites.add(site_exist)
+
+    tx_data = {
+        "content": f"User {user_number} bookmarks the site {site_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
 
     return {'data': "收藏成功"}
 
@@ -139,6 +164,12 @@ async def user_sites(user_number: str, site_id):
 
     # 删除收藏（无需解包 site_exist）
     await user_exist.sites.remove(site_exist)
+
+    tx_data = {
+        "content": f"User {user_number} cancels the bookmark of the site {site_id}.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
 
     return {'data': "取消收藏成功"}
 

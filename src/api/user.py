@@ -1,10 +1,23 @@
 import aiofiles
-from src.utils.codeutils import *
+import requests
+import time
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
 from src.setting import *
+from src.utils.codeutils import *
 
+bc_url = "http://localhost:8000/bc"  # 区块链API的基础URL
 user = APIRouter()
+
+# 封装区块链交易请求的函数
+async def add_transaction_to_blockchain(tx_data: dict):
+    """向区块链提交交易数据"""
+    try:
+        response = requests.post(f"{bc_url}/new_transaction", json=tx_data)
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="Failed to add transaction to blockchain")
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail="Error connecting to blockchain API")
 
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
@@ -26,6 +39,13 @@ async def add_user(new_user: UserSchema):
 
     # 插入数据库
     await User.create(**new_user.dict())
+
+    tx_data = {
+        "content": f"New user {new_user.number} is added to the database.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
     return {"data": "插入成功"}
 
 
@@ -49,7 +69,7 @@ async def login_user(new_user: UserSchema):
 
 
 @user.put('/avatar/{number}', description="修改头像")
-async def update_avatar(number: str, avatar: UploadFile = File()):
+async def update_avatar(number: str, avatar: UploadFile = File(...)):
     user_exist = await User.get_or_none(number=number)
     if user_exist is None:
         raise HTTPException(status_code=404, detail="该用户不存在")
@@ -62,6 +82,12 @@ async def update_avatar(number: str, avatar: UploadFile = File()):
     async with aiofiles.open(save_path, "wb") as buffer:
         await buffer.write(await avatar.read())
     await user_exist.save()
+
+    tx_data = {
+        "content": f"User {number} changes its avatar.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
 
     return {"data": save_path}
 
@@ -79,6 +105,13 @@ async def update_user(new_user: UserSchema):
 
     # 保存更新
     await user_exist.save()
+
+    tx_data = {
+        "content": f"User {new_user.number} changes its information.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
     return {"data": "用户信息更新成功"}
 
 
@@ -121,4 +154,11 @@ async def delete_user(phonenumber: str):
         # 如果手机号不存在
         raise HTTPException(status_code=404, detail="用户不存在")
     await phone_exist.delete()
+
+    tx_data = {
+        "content": f"User {phonenumber} is deleted.",
+        "timestamp": time.time()
+    }
+    # await add_transaction_to_blockchain(tx_data)
+
     return {"data": "删除成功"}

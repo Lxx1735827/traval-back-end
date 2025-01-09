@@ -9,6 +9,7 @@ import requests
 from src.utils.blockchain_utils import *
 from src.schema import *
 
+bc_url = "http://localhost:8000/bc"
 bc = APIRouter()
 
 # the node's copy of blockchain
@@ -17,20 +18,45 @@ blockchain = None
 # the address to other participating members of the network
 peers = set()
 
+# 向指定节点发送请求以加入peers
+def register(peer_address, peer_port):
+    try:
+        # 需要请求的Peer数据
+        peer_data = PeerSchema(node_address=peer_address, node_port=peer_port)
+
+        # 假设`register_with_existing_node`已经定义用于处理这种注册的路由
+        response = requests.post(f"http://{peer_address}:{peer_port}/register_node", json=peer_data.dict())
+
+        if response.status_code == 200:
+            print(f"Successfully registered with peer {peer_address}:{peer_port}")
+        else:
+            print(f"Failed to register with peer {peer_address}:{peer_port}. Status Code: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error while trying to register with {peer_address}:{peer_port}: {e}")
+
+# register("", "")
+
 @bc.post("/new_transaction", description="提交新的transaction到该node的blockchain里")
 def new_transaction(transaction: TransactionSchema):
     tx_data = transaction.dict()
-    required_fields = ["author", "content"]
+    required_fields = ["content", "timestamp"]
 
     for field in required_fields:
         if not tx_data.get(field):
             return HTTPException(status_code=404, detail="Invalid transaction data")
 
-    tx_data["timestamp"] = time.time()
+    # tx_data["timestamp"] = time.time()
 
     blockchain.add_new_transaction(tx_data)
 
-    return {"data": "Successfully hand in"}
+    try:
+        response = requests.post(f"{bc_url}/mine")  # 挖矿 API
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Failed to mine block.")
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail="Error triggering mining process")
+
+    return {"data": "Transaction added and mining started."}
 
 # 从多个block的list创建blockchain
 def create_chain_from_dump(chain_dump):
@@ -63,8 +89,12 @@ chain_file_name = os.environ.get('BLOCKCHAIN_DATA_FILE')
 # 将最新的区块链信息存储当本地文件中
 def save_chain():
     if chain_file_name is not None:
+        # 获取区块链的最新状态
+        chain_data = get_chain()
+        # 保证写入时将其转换为正确的格式
         with open(chain_file_name, 'w') as chain_file:
-            chain_file.write(get_chain())
+            chain_file.write(chain_data)
+
 
 def exit_from_signal(signum, stack_frame):
     sys.exit(0)
@@ -78,12 +108,19 @@ if chain_file_name is None:
     data = None
 
 else:
-    with open(chain_file_name, 'r') as chain_file:
-        raw_data = chain_file.read()
-        if raw_data is None or len(raw_data) == 0:
-            data = None
-        else:
-            data = json.loads(raw_data)
+    # 读取区块链文件
+    if os.path.exists(chain_file_name):
+        with open(chain_file_name, 'r') as chain_file:
+            raw_data = chain_file.read()
+            if raw_data:
+                try:
+                    data = json.loads(raw_data)
+                except json.JSONDecodeError:
+                    data = None
+            else:
+                data = None
+    else:
+        data = None
 
 if data is None:
     # the node's copy of blockchain

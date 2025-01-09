@@ -7,6 +7,7 @@ from src.api.ai import ai
 from src.api.restaurant import restaurant
 from src.api.review import review
 from src.api.route import route
+from src.api.blockchain import bc
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
@@ -20,7 +21,7 @@ app.include_router(ai, prefix="/ai", tags=["ai"])
 app.include_router(restaurant, prefix="/restaurant", tags=["restaurant"])
 app.include_router(review, prefix="/review", tags=["review"])
 app.include_router(route, prefix="/route", tags=["route"])
-
+app.include_router(bc, prefix="/bc", tags=["bc"])
 
 # 定义一个继承自BaseHTTPMiddleware的自定义中间件类
 class CustomMiddleware(BaseHTTPMiddleware):
