@@ -8,3 +8,6 @@ aiofiles
 spark_ai_python
 aliyun-python-sdk-core
 regex
+websocket-client
+matplotlib
+scikit-learn

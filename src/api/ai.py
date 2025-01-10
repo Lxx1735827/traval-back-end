@@ -5,6 +5,7 @@ import re
 
 from fastapi import APIRouter, HTTPException, File, UploadFile
 from fastapi.responses import StreamingResponse
+from typing import List
 
 from src.utils.aiutils import *
 from src.utils.aiutils2 import *
@@ -171,3 +172,30 @@ async def delete_one(conversation_id: int):
     # 返回确认删除的信息
     return {"data": "对话已删除"}
 
+@ai.post("/route-recommend", description="路径规划之AI推荐")
+async def route_recommend(city: str, days: int, tag: str):
+    # 查询包含 city 的前50个景点
+    cities = await Site.filter(location__icontains=city)[:30]
+
+    if not cities:
+        raise HTTPException(status_code=401, detail="没有这个城市")
+    try:
+        # 处理获取到的景点数据
+        data = [[city.id, city.name] for city in cities]
+        answer = str(data) + "在以上的景点当中推荐10个符合下面标签的景点，标签为：" + tag + ",返回只id，用英文逗号隔开"
+
+        # 模拟外部推荐系统返回的推荐景点id（这里使用 completion2 生成推荐列表）
+        recommended_ids = completion2(answer).split(',')
+
+        # 将返回的推荐id转换为整数列表
+        recommended_ids = [int(recommended_id.strip()) for recommended_id in recommended_ids]
+
+        # 根据推荐的id查询符合条件的景点
+        recommended_cities = await Site.filter(id__in=recommended_ids)[:15]
+
+        # 返回推荐景点的id列表
+        return {"city_data": [[city.id, city.name, city.picture, city.location, city.description] for city in recommended_cities],
+                "days": days}
+    except:
+        return {"city_data": [[city.id, city.name, city.picture, city.location, city.description] for city in cities[:15]],
+                "days": days}
