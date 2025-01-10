@@ -8,6 +8,7 @@ from src.api.restaurant import restaurant
 from src.api.review import review
 from src.api.route import route
 from src.api.blockchain import bc
+from src.api.language import language
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.staticfiles import StaticFiles
@@ -22,6 +23,7 @@ app.include_router(restaurant, prefix="/restaurant", tags=["restaurant"])
 app.include_router(review, prefix="/review", tags=["review"])
 app.include_router(route, prefix="/route", tags=["route"])
 app.include_router(bc, prefix="/bc", tags=["bc"])
+app.include_router(language, prefix="/language", tags=["language"])
 
 # 定义一个继承自BaseHTTPMiddleware的自定义中间件类
 class CustomMiddleware(BaseHTTPMiddleware):
@@ -53,7 +55,7 @@ register_tortoise(
     add_exception_handlers=True,  # 添加异常处理
 )
 # 将 static 目录中的文件作为静态文件提供
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(CustomMiddleware)
 
 
