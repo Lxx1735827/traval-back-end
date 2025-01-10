@@ -11,3 +11,5 @@ regex
 websocket-client
 matplotlib
 scikit-learn
+qrcode
+pillow
