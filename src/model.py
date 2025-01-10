@@ -18,6 +18,8 @@ class User(Model):
     check_restaurants = fields.ManyToManyField("models.Restaurant", related_name="check_restaurant_user", through="user_check_restaurant", description="用户打卡的餐厅")
     is_shown = fields.IntField(description="标识", default=1)
     strategy = fields.ReverseRelation["Strategy"]
+    qrcode = fields.CharField(max_length=255, description="二维码", default="static/qrcode/0.png")
+    # 记得在数据库添加qrcode属性，生成一个0.png
 
 
 class Text(Model):

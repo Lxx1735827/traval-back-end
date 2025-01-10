@@ -5,6 +5,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
 from src.setting import *
 from src.utils.codeutils import *
+from src.utils.qrcode_utils import *
 
 bc_url = "http://localhost:8000/bc"  # 区块链API的基础URL
 user = APIRouter()
@@ -39,6 +40,8 @@ async def add_user(new_user: UserSchema):
 
     # 插入数据库
     await User.create(**new_user.dict())
+    source_path = r'static/qrcode'
+    file = await get_qrcode(source_path, new_user.number)
 
     tx_data = {
         "content": f"New user {new_user.number} is added to the database.",
@@ -162,3 +165,17 @@ async def delete_user(phonenumber: str):
     # await add_transaction_to_blockchain(tx_data)
 
     return {"data": "删除成功"}
+
+@user.get("/qrcode/{user_number}", description="生成并获取用户的二维码")
+async def qrcode(user_number: str):
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
+    # file = user_exist.qrcode
+    if user_exist.qrcode == 'static/qrcode/0.png':
+        source_path = r'static/qrcode'
+        file = await get_qrcode(source_path, user_number)
+    else:
+        file = user_exist.qrcode
+    return {"data": file}
+
