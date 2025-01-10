@@ -53,7 +53,7 @@ register_tortoise(
     add_exception_handlers=True,  # 添加异常处理
 )
 # 将 static 目录中的文件作为静态文件提供
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 app.add_middleware(CustomMiddleware)
 
 
