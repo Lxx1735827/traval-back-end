@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from setting import *
+from src.setting import *
 import uvicorn
 from src.api.user import user
 from src.api.site import site
