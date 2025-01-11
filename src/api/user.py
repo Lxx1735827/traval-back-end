@@ -4,6 +4,7 @@ import time
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from src.schema import *
 from src.setting import *
+from src.utils.passwordutils import *
 from src.utils.codeutils import *
 from src.utils.qrcode_utils import *
 
@@ -23,7 +24,6 @@ async def add_transaction_to_blockchain(tx_data: dict):
 
 @user.get("/{user_number}", description="得到一个用户的所有信息")
 async def get_user(user_number: str):
-    print("get_user")
     user_exist = await User.get_or_none(number=user_number)
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
@@ -39,7 +39,13 @@ async def add_user(new_user: UserSchema):
     # 验证码 TODO
 
     # 插入数据库
-    await User.create(**new_user.dict())
+    data = new_user.dict()
+    salt, derived_key, iterations = generate_password_hash(data["password"])
+    salt_hex = binascii.hexlify(salt).decode('utf-8')
+    derived_key_hex = binascii.hexlify(derived_key).decode('utf-8')
+    data["password"] = derived_key_hex
+    data["salt"] = salt_hex
+    await User.create(**data)
     source_path = r'static/qrcode'
     file = await get_qrcode(source_path, new_user.number)
 
@@ -58,7 +64,10 @@ async def login_user(new_user: UserSchema):
     user_exist = await User.get_or_none(number=new_user.number)
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User not found.")
-    if new_user.password != user_exist.password:
+    stored_salt = bytes.fromhex(user_exist.salt)
+    stored_derived_key = bytes.fromhex(user_exist.password)
+    is_valid = verify_password(new_user.password, stored_salt, stored_derived_key, user_exist.iter)
+    if not is_valid:
         raise HTTPException(status_code=400, detail="The password is incorrect")
     # 验证码 TODO
         # 返回用户信息（排除敏感数据）
