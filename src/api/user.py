@@ -6,6 +6,7 @@ from src.schema import *
 from src.setting import *
 from src.utils.codeutils import *
 from src.utils.qrcode_utils import *
+from src.utils.friend_utils import *
 
 bc_url = "http://localhost:8000/bc"  # 区块链API的基础URL
 user = APIRouter()
@@ -178,4 +179,35 @@ async def qrcode(user_number: str):
     else:
         file = user_exist.qrcode
     return {"data": file}
+
+@user.post("/friend/ask", description="user1向user2发送添加好友请求")
+async def friend_ask(user1_number: str, user2_number: str):
+    double_user_exist(user1_number, user2_number)
+
+    msg = ask_for_friend(user1_number, user2_number)
+
+    return {"data": msg}
+
+@user.post("/friend/accept", description="user2接受user1的好友添加请求")
+async def friend_accept(user1_number: str, user2_number: str):
+    double_user_exist(user1_number, user2_number)
+
+    msg = accept_as_friend(user1_number, user2_number)
+
+    return {"data": msg}
+
+@user.post("/friend/if", description="判断2个user是否为好友")
+async def friend_if(user1_number: str, user2_number: str):
+    double_user_exist(user1_number, user2_number)
+
+    msg = are_friend(user1_number, user2_number)
+
+    return {"data": msg}
+
+
+
+
+
+
+
 
