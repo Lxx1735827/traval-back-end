@@ -19,7 +19,14 @@ class User(Model):
     is_shown = fields.IntField(description="标识", default=1)
     strategy = fields.ReverseRelation["Strategy"]
     qrcode = fields.CharField(max_length=255, description="二维码", default="static/qrcode/0.png")
-    # 记得在数据库添加qrcode属性，生成一个0.png
+
+class Friendship(Model):
+    id = fields.IntField(pk=True)
+    user1_numebr = fields.CharField(max_length=11, description="user1电话号码") #小
+    user2_numebr = fields.CharField(max_length=11, description="user2电话号码") #大
+    status = fields.IntField(description="是否加为好友", default=0) # 0:均未申请 1:小向大发出申请 2:大向小发出申请 3:结为好友
+    content = fields.CharField(max_length=10000, description="历史对话")
+
 
 
 class Text(Model):
