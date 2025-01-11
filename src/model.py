@@ -8,7 +8,9 @@ class User(Model):
     id = fields.IntField(pk=True, max_length=11)
     number = fields.CharField(max_length=11, description="电话号码")
     username = fields.CharField(max_length=20, description="用户名", default="username")
-    password = fields.CharField(max_length=11, description="密码")
+    password = fields.CharField(max_length=300, description="密码")
+    salt = fields.CharField(max_length=300, description="盐", default="string")
+    iter = fields.IntField(description="迭代次数", default=1000)
     avatar = fields.CharField(max_length=255, description="头像", default="static/user/默认头像.png")
     sites = fields.ManyToManyField("models.Site", related_name="User", through="user_site", description="用户收藏的景点")
     conversations = fields.ReverseRelation["Conversation"]
