@@ -51,10 +51,10 @@ async def ask_for_friend(user1_number: str, user2_number: str):
 
     else:
         if small == user1_number:
-            await Friendship.create(user1_number=small, user2_numebr=large, status=1)
+            await Friendship.create(user1_number=small, user2_number=large, status=1)
             return "好友请求发送成功"
         else:
-            await Friendship.create(user1_number=small, user2_numebr=large, status=2)
+            await Friendship.create(user1_number=small, user2_number=large, status=2)
             return "好友请求发送成功"
 
 async def accept_as_friend(user1_number: str, user2_number: str):
@@ -100,3 +100,4 @@ async def are_friend(user1_number: str, user2_number: str):
     if friendship:
         return "true"
     return "false"
+

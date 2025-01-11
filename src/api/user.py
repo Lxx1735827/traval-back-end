@@ -1,7 +1,12 @@
+import re
+
 import aiofiles
 import requests
 import time
 from fastapi import APIRouter, File, UploadFile, HTTPException
+from tortoise import Tortoise
+from tortoise.exceptions import DoesNotExist
+from tortoise.expressions import Q
 from src.schema import *
 from src.setting import *
 from src.utils.passwordutils import *
@@ -191,27 +196,116 @@ async def qrcode(user_number: str):
 
 @user.post("/friend/ask", description="user1向user2发送添加好友请求")
 async def friend_ask(user1_number: str, user2_number: str):
-    double_user_exist(user1_number, user2_number)
+    await double_user_exist(user1_number, user2_number)
 
-    msg = ask_for_friend(user1_number, user2_number)
+    msg = await ask_for_friend(user1_number, user2_number)
 
     return {"data": msg}
 
 @user.post("/friend/accept", description="user2接受user1的好友添加请求")
 async def friend_accept(user1_number: str, user2_number: str):
-    double_user_exist(user1_number, user2_number)
+    await double_user_exist(user1_number, user2_number)
 
-    msg = accept_as_friend(user1_number, user2_number)
+    msg = await accept_as_friend(user1_number, user2_number)
 
     return {"data": msg}
 
 @user.post("/friend/if", description="判断2个user是否为好友")
 async def friend_if(user1_number: str, user2_number: str):
-    double_user_exist(user1_number, user2_number)
+    await double_user_exist(user1_number, user2_number)
 
-    msg = are_friend(user1_number, user2_number)
+    msg = await are_friend(user1_number, user2_number)
 
     return {"data": msg}
+
+@user.get("/friend/{user_number}", description="获取用户的好友列表")
+async def user_all_friend(user_number: str):
+    print("get into")
+    # 检查用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
+
+    friendships = await Friendship.filter(
+        (Q(user1_number=user_number) | Q(user2_number=user_number))& Q(status=3)
+    )
+    print("friendships")
+    if not friendships:
+        return {"user_number": user_number, "friends_list": []}
+
+    # 提取好友号码
+    friend_numbers = [
+        friendship.user2_number if friendship.user1_number == user_number else friendship.user1_number
+        for friendship in friendships
+    ]
+    print("friend_numbers")
+    # 获取好友详细信息
+    friends = await User.filter(number__in=friend_numbers).values("id", "number", "username", "avatar", "qrcode")
+    return {
+        "user_number": user_number,
+        "friends_list": friends
+    }
+
+
+@user.post("/search", description="关键词搜索用户")
+async def search_user(key: str):
+    key_parts = list(key)
+    numbers_set = set()  # 使用集合来去重
+    print(key_parts)
+    for key_part in key_parts:
+        # 查找匹配用户名的用户
+        numbers = await User.filter(Q(username__icontains=key_part)).values("number")
+        for number in numbers:
+            numbers_set.add(number['number'])
+    users_list = await User.filter(number__in=list(numbers_set)).values("id", "number", "username", "avatar", "qrcode")
+    return {"key": key, "results": users_list}
+
+
+
+@user.post("/friend/search", description="关键词搜索用户的好友")
+async def search_friend(user_number: str, key: str):
+    # 检查用户是否存在
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
+
+    # 获取用户的好友关系
+    friendships = await Friendship.filter(
+        (Q(user1_number=user_number) | Q(user2_number=user_number)) & Q(status=3)
+    )
+    if not friendships:
+        return {"user_number": user_number, "key": key, "results": []}
+
+    # 提取好友的电话号码
+    friend_numbers = [
+        friendship.user2_number if friendship.user1_number == user_number else friendship.user1_number
+        for friendship in friendships
+    ]
+
+    key_parts = list(key)
+    numbers_set = set()  # 使用集合来去重
+    print(key_parts)
+    for key_part in key_parts:
+        # 查找匹配用户名的用户
+        numbers = await User.filter(number__in=friend_numbers).filter(Q(username__icontains=key_part)).values("number")
+        for number in numbers:
+            numbers_set.add(number['number'])
+
+    users_list = await User.filter(number__in=list(numbers_set)).values("id", "number", "username", "avatar", "qrcode")
+
+    # # 搜索好友中匹配关键字的用户
+    # friends = await User.filter(
+    #     number__in=friend_numbers
+    # ).filter(
+    #     fields.F("username__icontains") == key | fields.F("number__icontains") == key
+    # ).values("id", "number", "username", "avatar", "qrcode")
+
+    return {
+        "user_number": user_number,
+        "key": key,
+        "results": users_list
+    }
+
 
 
 
