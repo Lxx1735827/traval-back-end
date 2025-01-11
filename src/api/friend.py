@@ -1,8 +1,10 @@
-import time
 import os
+import re
+import aiofiles
 from fastapi import APIRouter, HTTPException
 from tortoise.expressions import Q
 from fastapi import File, UploadFile
+from datetime import datetime
 from typing import Dict
 
 from src.schema import FriendConversationSchema
@@ -17,6 +19,32 @@ async def send_message(message: FriendConversationSchema):
     if user2 is None:
         raise HTTPException(status_code=404, detail="好友不存在")
     await FriendConversation.create(**message.dict())
+    return {"data": "发送成功"}
+
+
+@friend.post('/send-message/picture', description="发送携带图片的信息")
+async def send_message_picture(user_id1: str, user_id2: str, content: str, create_time: str, file: UploadFile = File(...)):
+    user2 = await User.get_or_none(number=user_id2)
+    if user2 is None:
+        raise HTTPException(status_code=404, detail="好友不存在")
+    now = datetime.now()
+    formatted_time = now.strftime('%Y-%m-%d %H:%M')
+    safe_file_name = re.sub(r'[<>:"/\\|?*]', '_', formatted_time)
+
+    save_directory = "static/conversation"  # 存放头像文件的目录
+    file_extension = os.path.splitext(file.filename)[1]  # 获取文件的扩展名
+    save_path = save_directory + f"/{safe_file_name}{file_extension}"
+    async with aiofiles.open(save_path, "wb") as buffer:
+        await buffer.write(await file.read())
+    content = f"##[{save_path}]" + content
+    message = {
+        "user_id1": user_id1,
+        "user_id2": user_id2,
+        "content": content,
+        "state": 0,
+        "create_time": create_time
+    }
+    await FriendConversation.create(**message)
     return {"data": "发送成功"}
 
 
