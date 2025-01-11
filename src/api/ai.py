@@ -194,8 +194,8 @@ async def route_recommend(city: str, days: int, tag: str):
         recommended_cities = await Site.filter(id__in=recommended_ids)[:15]
 
         # 返回推荐景点的id列表
-        return {"city_data": [[city.id, city.name, city.picture, city.location, city.description] for city in recommended_cities],
+        return {"city_data": [[city.id, city.name, city.picture, city.location, city.latitude, city.longitude, city.description] for city in recommended_cities],
                 "days": days}
     except:
-        return {"city_data": [[city.id, city.name, city.picture, city.location, city.description] for city in cities[:15]],
+        return {"city_data": [[city.id, city.name, city.picture, city.location, city.latitude, city.longitude, city.description] for city in cities[:15]],
                 "days": days}
