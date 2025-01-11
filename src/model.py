@@ -20,6 +20,7 @@ class User(Model):
     check_restaurants = fields.ManyToManyField("models.Restaurant", related_name="check_restaurant_user", through="user_check_restaurant", description="用户打卡的餐厅")
     is_shown = fields.IntField(description="标识", default=1)
     strategy = fields.ReverseRelation["Strategy"]
+    note = fields.ReverseRelation["Note"]
     qrcode = fields.CharField(max_length=255, description="二维码", default="static/qrcode/0.png")
 
 class Friendship(Model):
@@ -121,3 +122,28 @@ class SiteRelationship(Model):
     site_from_ids = fields.CharField(max_length=2000)
     site_to_ids = fields.CharField(max_length=2000)
 
+
+class FriendConversation(Model):
+    id = fields.IntField(pk=True, description="聊天id")
+    user_id1 = fields.CharField(max_length=11, description="用户1")
+    user_id2 = fields.CharField(max_length=11, description="用户2")
+    content = fields.TextField(description="聊天内容")
+    state = fields.IntField(default=0, description="是否已读状态")
+    create_time = fields.CharField(max_length=20, description="时间")
+
+
+class Note(Model):
+    id = fields.IntField(pk=True, description="笔记id")
+    picture = fields.CharField(max_length=300, description="图片")
+    name = fields.CharField(max_length=20, description="名字")
+    content = fields.CharField(max_length=1000, description="文字内容")
+    user = fields.ForeignKeyField("models.User", related_name="Note", on_delete=fields.SET_NULL, null=True)
+    tag = fields.IntField(max_length=11, description="攻略id")
+
+
+class NoteReview(Model):
+    id = fields.IntField(pk=True, max_length=12)
+    entity_id = fields.IntField(description="笔记id")  # 合并为同一列
+    user_number = fields.CharField(max_length=11, description="电话号码")
+    content = fields.TextField(description="评论内容", null=True)
+    created_at = fields.CharField(max_length=20, description="记录时间")  # 添加记录时间属性

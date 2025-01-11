@@ -71,7 +71,6 @@ async def complete_conversation(conversation_id: int, picture: UploadFile = File
     save_directory = "static/conversation"  # 存放头像文件的目录
     file_extension = os.path.splitext(picture.filename)[1]  # 获取文件的扩展名
     save_path = save_directory + f"/{safe_file_name}{file_extension}"
-    print(save_path)
     async with aiofiles.open(save_path, "wb") as buffer:
         await buffer.write(await picture.read())
     content = formatted_time + ":::" + "user" + ":::" + f"[{content}]" +f"[{save_path}]"+ ";;;"
