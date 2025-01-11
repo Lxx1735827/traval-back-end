@@ -121,3 +121,12 @@ class SiteRelationship(Model):
     site_from_ids = fields.CharField(max_length=2000)
     site_to_ids = fields.CharField(max_length=2000)
 
+
+class FriendConversation(Model):
+    id = fields.IntField(pk=True, description="聊天id")
+    user_id1 = fields.CharField(max_length=11, description="用户1")
+    user_id2 = fields.CharField(max_length=11, description="用户2")
+    content = fields.TextField(description="聊天内容")
+    state = fields.IntField(default=0, description="是否已读状态")
+    create_time = fields.CharField(max_length=20, description="时间")
+
