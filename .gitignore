@@ -1,9 +1,0 @@
-/ssh_keys/
-/src/static/
-/migrations/
-/pyproject.toml
-/src/wmy/
-/.idea/
-/src.zip
-/src/accesskey.py
-src/__pycache__/

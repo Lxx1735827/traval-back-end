@@ -250,6 +250,7 @@ async def user_recommend_sites(user_number: str):
 
     return {"data": site_list}
 
+# 用户打卡景点
 @site.post('/user_check_site', description='用户打卡景点')
 async def user_check_site(user_number: str, site_id: int):
     # 查找用户是否存在
@@ -262,8 +263,8 @@ async def user_check_site(user_number: str, site_id: int):
     if site_exist is None:
         raise HTTPException(status_code=400, detail="景点不存在")
 
-    # 添加收藏（无需解包 site_exist）
-    await user_exist.check_sites.add(site_exist)
+    # 添加用户打卡记录
+    await UserCheckSite.create(user_number=user_number, site_id=site_id, check_time=datetime.utcnow())
 
     tx_data = {
         "content": f"User {user_number} checks in the site {site_id}.",
@@ -271,28 +272,44 @@ async def user_check_site(user_number: str, site_id: int):
     }
     # await add_transaction_to_blockchain(tx_data)
 
-    return {'data': "收藏成功"}
+    return {'data': "打卡成功"}
 
 
+# 获取用户的打卡景点列表
 @site.get('/user_check/{user_number}', description='得到用户的景点打卡列表')
 async def user_check_sites(user_number: str):
     # 查找用户是否存在
-    user_exist = await User.get_or_none(number=user_number).prefetch_related('sites')
+    user_exist = await User.get_or_none(number=user_number)
     if user_exist is None:
         raise HTTPException(status_code=400, detail="用户不存在")
 
-    # 获取用户收藏的景点
-    sites = await user_exist.check_sites.all()
+    # 获取用户打卡的景点ID以及打卡时间
+    check_sites = await UserCheckSite.filter(user_number=user_number).all()
 
-    # 构造返回的数据结构
-    site_list = [{"id": new_site.id, "name": new_site.name, "city": new_site.city, "location": new_site.location,
-                  "picture": new_site.picture, "longitude": new_site.longitude, "latitude": new_site.latitude} for new_site in sites]
+    # 获取景点信息
+    site_list = []
+    for check_site in check_sites:
+        # 根据 site_id 从 Site 表中筛选景点
+        site = await Site.get_or_none(id=check_site.site_id)
+        if site:
+            site_list.append({
+                "id": site.id,
+                "name": site.name,
+                "city": site.city,
+                "location": site.location,
+                "picture": site.picture,
+                "longitude": site.longitude,
+                "latitude": site.latitude,
+                "check_time": check_site.check_time.strftime('%Y-%m-%d %H:%M:%S')
+            })
 
     return {"data": site_list}
 
 
+
+# 用户取消打卡景点
 @site.delete("/user_check_site", description="用户取消打卡景点")
-async def user_sites(user_number: str, site_id):
+async def user_sites(user_number: str, site_id: int):
     # 查找用户是否存在
     user_exist = await User.get_or_none(number=user_number)
     if user_exist is None:
@@ -303,8 +320,12 @@ async def user_sites(user_number: str, site_id):
     if site_exist is None:
         raise HTTPException(status_code=400, detail="景点不存在")
 
-    # 删除收藏（无需解包 site_exist）
-    await user_exist.check_sites.remove(site_exist)
+    # 删除用户的打卡记录
+    check_site_record = await UserCheckSite.filter(user_number=user_number, site_id=site_id).first()
+    if check_site_record is None:
+        raise HTTPException(status_code=400, detail="用户没有打卡该景点")
+
+    await check_site_record.delete()
 
     tx_data = {
         "content": f"User {user_number} cancels the checking-in of the site {site_id}.",
@@ -313,4 +334,5 @@ async def user_sites(user_number: str, site_id):
     # await add_transaction_to_blockchain(tx_data)
 
     return {'data': "取消打卡成功"}
+
 

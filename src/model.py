@@ -66,13 +66,14 @@ class Site(Model):
     check_users = fields.ManyToManyField("models.User", related_name="check_site", through="user_check_site",
                                    description="打卡过该景点的用户")
     # review_1 = fields.TextField(description="景点评论", null=True)
-    # review_2 = fields.TextField(description="景点评论", null=True)
-    # review_3 = fields.TextField(description="景点评论", null=True)
-    # review_4 = fields.TextField(description="景点评论", null=True)
-    # review_5 = fields.TextField(description="景点评论", null=True)
 
     type = fields.CharField(max_length=50, description="对象类型", default="景点")  # 添加type属性
 
+
+class UserCheckSite(Model):
+    user_number = fields.CharField(max_length=11, description="user电话号码")
+    site_id = fields.IntField(pk=True, max_length=11, description="景点id")
+    check_time = fields.DatetimeField(default=datetime.utcnow, description="用户打卡的时间")
 
 class Restaurant(Model):
     id = fields.IntField(pk=True, max_length=11)
