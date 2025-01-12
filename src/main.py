@@ -29,6 +29,18 @@ app.include_router(language, prefix="/language", tags=["language"])
 app.include_router(friend, prefix="/friend", tags=["friend"])
 app.include_router(note, prefix="/note", tags=["note"])
 
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+from pathlib import Path
+
+# 设置模板文件路径
+templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
+
+# 定义主页路由，渲染index.html模板
+@app.get("/")
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 # 定义一个继承自BaseHTTPMiddleware的自定义中间件类
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
