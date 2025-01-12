@@ -300,7 +300,7 @@ async def user_check_sites(user_number: str):
                 "picture": site.picture,
                 "longitude": site.longitude,
                 "latitude": site.latitude,
-                "check_time": check_site.check_time.strftime('%Y-%m-%d %H:%M:%S')
+                "check_time": check_site.check_time
             })
 
     return {"data": site_list}
