@@ -148,3 +148,12 @@ class NoteReview(Model):
     user_number = fields.CharField(max_length=11, description="电话号码")
     content = fields.TextField(description="评论内容", null=True)
     created_at = fields.CharField(max_length=20, description="记录时间")  # 添加记录时间属性
+
+
+class Recommend(Model):
+    id = fields.IntField(pk=True, max_length=11)
+    name = fields.CharField(max_length=100, description="标题")
+    tag = fields.CharField(max_length=10, description="热点，游戏，文人，书籍")
+    sites_id = fields.CharField(max_length=100, description="相关景点id字符串")
+    day_time = fields.CharField(max_length=10, description="日期")
+    picture = fields.CharField(max_length=100, description="封面图片")

@@ -2,11 +2,15 @@ import os
 import re
 import aiofiles
 import time
+from datetime import date
 from fastapi import APIRouter, HTTPException
+from tortoise.expressions import Q
 from fastapi import UploadFile
 from typing import List
 
-from src.model import Note, User, NoteReview
+from src.model import Note, User, NoteReview, Recommend
+from src.utils.hotutils import *
+from src.utils.aiutils3 import create_picture
 
 note = APIRouter()
 
@@ -28,6 +32,119 @@ async def create_note(number: str,  name: str, content: str, files: List[UploadF
     await Note.create(name=name, picture=pictures, content=content, user=exist_user, tag=tag)
 
     return {"data": "生成成功"}
+
+
+@note.get("/create-hot", description="定时更新热点")
+async def create_hot():
+    # 更新旅游热点
+    hots = get_hot()
+    for hot in hots:
+        create_picture(hot, "static/hot/"+hot+".jpg")
+        current_date = str(date.today())
+        sites = get_sites(hot)
+        ids = ""
+        for site in sites:
+            try:
+                city, name, description = get_info(site)
+                location, longitude, latitude = get_location(site, city)
+                create_picture(name, "static/site/"+name+".jpg")
+                site_data = {
+                    "name": name,
+                    "city": city,
+                    "description": description,
+                    "location": location,
+                    "longitude": longitude,
+                    "latitude": latitude,
+                    "picture": "static/site/"+name+".jpg"
+                }
+                site_ = await Site.create(**site_data)
+                ids += str(site_.id) + ","
+            except:
+                continue
+        await Recommend.create(tag="热点", name=hot, sites_id=ids, day_time=current_date, picture="static/hot/"+hot+".jpg")
+    return {"data": "success"}
+
+
+@note.get("/create-people", description="文人路线")
+async def create_people(people: str, sites: str):
+    sites = sites.split(",")
+    create_picture(people, "static/hot/" + people + ".jpg")
+    current_date = str(date.today())
+    ids = ""
+    for site in sites:
+        try:
+            city, name, description = get_info(site)
+            location, longitude, latitude = get_location(site, city)
+            create_picture(name, "static/site/" + name + ".jpg")
+            site_data = {
+                "name": name,
+                "city": city,
+                "description": description,
+                "location": location,
+                "longitude": longitude,
+                "latitude": latitude,
+                "picture": "static/site/" + name + ".jpg"
+            }
+            site_ = await Site.create(**site_data)
+            ids += str(site_.id) + ","
+        except:
+            continue
+    await Recommend.create(tag="文人", name=people, sites_id=ids, day_time=current_date,
+                           picture="static/hot/" + people + ".jpg")
+    return {"data": "success"}
+
+
+@note.get("/create-book", description="书籍路线")
+async def create_book(book: str, sites: str):
+    sites = sites.split(",")
+    # create_picture(book, "static/hot/" + book + ".jpg")
+    current_date = str(date.today())
+    ids = ""
+    for site in sites:
+        try:
+            city, name, description = get_info(site)
+            location, longitude, latitude = get_location(site, city)
+            create_picture(name, "static/site/" + name + ".jpg")
+            site_data = {
+                "name": name,
+                "city": city,
+                "description": description,
+                "location": location,
+                "longitude": longitude,
+                "latitude": latitude,
+                "picture": "static/site/" + name + ".jpg"
+            }
+            site_ = await Site.create(**site_data)
+            ids += str(site_.id) + ","
+        except:
+            continue
+    await Recommend.create(tag="书籍", name=book, sites_id=ids, day_time=current_date,
+                           picture="static/hot/" + book + ".jpg")
+    return {"data": "success"}
+
+
+@note.get("/get-recommend/{tag}", description="获得推荐目录")
+async def get_recommend(tag: str):
+    if tag == '热点':
+        current_date = str(date.today())
+        datas = await Recommend.filter(Q(day_time=current_date) & Q(tag=tag))
+        info = [{"id": data.id, "name": data.name, "picture": data.picture} for data in datas]
+        return {"data": info}
+    else:
+        datas = await Recommend.filter(tag=tag)
+        info = [{"id": data.id, "name": data.name, "picture": data.picture} for data in datas]
+        return {"data": info}
+
+
+@note.get("/get-sites/{tag_id}", description="获得景点")
+async def get_sites(tag_id: int):
+    datas = await Recommend.get_or_none(id=tag_id)
+    sites_id = datas.sites_id[:-1].split(',')
+    print(sites_id)
+    sites_id = [int(site) for site in sites_id]
+    sites = await Site.filter(id__in=sites_id).all()
+    info = [{"id": site.id, "name": site.name, "picture": site.picture, "description": site.description} for site in sites]
+    return {"data": info}
 
 
 @note.get("/{user_id}", description="获得用户所有笔记")
