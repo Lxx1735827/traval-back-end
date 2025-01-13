@@ -13,6 +13,7 @@ from src.utils.passwordutils import *
 from src.utils.codeutils import *
 from src.utils.qrcode_utils import *
 from src.utils.friend_utils import *
+from src.accesskey import *
 
 bc_url = "http://localhost:8000/bc"  # 区块链API的基础URL
 user = APIRouter()
@@ -218,6 +219,30 @@ async def friend_if(user1_number: str, user2_number: str):
 
     return {"data": msg}
 
+@user.delete("/friend/delete", description="删除好友")
+async def delete_friend(user1_number: str, user2_number: str):
+    await double_user_exist(user1_number, user2_number)
+
+    if user1_number == user2_number:
+        raise HTTPException(status_code=400, detail="不能添加自己为好友")
+    elif user1_number > user2_number:
+        small = user2_number
+        large = user1_number
+    else:
+        small = user1_number
+        large = user2_number
+
+    friendship = await Friendship.filter(user1_number=small, user2_number=large).first()
+
+    if friendship:
+        if friendship.status == 3:
+            friendship.status = 0
+            return {"data": "好友删除成功"}
+        else:
+            raise HTTPException(status_code=400, detail="目前二人还不是好友")
+    else:
+        raise HTTPException(status_code=404, detail="未找到好友记录")
+
 @user.get("/friend/{user_number}", description="获取用户的好友列表")
 async def user_all_friend(user_number: str):
     print("get into")
@@ -293,18 +318,19 @@ async def search_friend(user_number: str, key: str):
 
     users_list = await User.filter(number__in=list(numbers_set)).values("id", "number", "username", "avatar", "qrcode")
 
-    # # 搜索好友中匹配关键字的用户
-    # friends = await User.filter(
-    #     number__in=friend_numbers
-    # ).filter(
-    #     fields.F("username__icontains") == key | fields.F("number__icontains") == key
-    # ).values("id", "number", "username", "avatar", "qrcode")
-
     return {
         "user_number": user_number,
         "key": key,
         "results": users_list
     }
+
+from wechatpy import parse_message, create_reply
+from wechatpy.utils import check_signature
+from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
+# @user.post("/wechat", description="转发消息到微信")
+# async def send_wechat(user_number: str, msg: str):
+
+
 
 
 
