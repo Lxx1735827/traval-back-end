@@ -13,7 +13,6 @@ from src.utils.passwordutils import *
 from src.utils.codeutils import *
 from src.utils.qrcode_utils import *
 from src.utils.friend_utils import *
-from src.accesskey import *
 
 bc_url = "http://localhost:8000/bc"  # 区块链API的基础URL
 user = APIRouter()
@@ -237,6 +236,7 @@ async def delete_friend(user1_number: str, user2_number: str):
     if friendship:
         if friendship.status == 3:
             friendship.status = 0
+            await friendship.save()
             return {"data": "好友删除成功"}
         else:
             raise HTTPException(status_code=400, detail="目前二人还不是好友")
@@ -324,11 +324,26 @@ async def search_friend(user_number: str, key: str):
         "results": users_list
     }
 
-from wechatpy import parse_message, create_reply
-from wechatpy.utils import check_signature
-from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
+@user.get("/friend/ask/{user_number}", description="获取用户的被申请好友列表")
+async def get_friend_ask(user_number: str):
+    user_exist = await User.get_or_none(number=user_number)
+    if user_exist is None:
+        raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
+
+    friendships = await Friendship.filter(
+        (Q(user1_number=user_number & Q(status=2)) | Q(user2_number=user_number) & Q(status=1))
+    )
+    users_list = []
+    if friendships:
+        friend_numbers = [
+            friendship.user2_number if friendship.user1_number == user_number else friendship.user1_number
+            for friendship in friendships
+        ]
+        users_list = await User.filter(number__in=list(friend_numbers)).values("id", "number", "username", "avatar", "qrcode")
+    return {"user_number": user_number, "asked_friend": users_list}
 # @user.post("/wechat", description="转发消息到微信")
 # async def send_wechat(user_number: str, msg: str):
+
 
 
 
