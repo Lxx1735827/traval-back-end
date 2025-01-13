@@ -13,3 +13,7 @@ matplotlib
 scikit-learn
 qrcode
 pillow
+requests
+lxml
+wechatpy
+Jinja2
