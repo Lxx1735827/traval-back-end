@@ -3,7 +3,7 @@ import os
 TORTOISE_ORM = {
     "connections": {
         # 使用 aiomysql 连接 MySQL
-        "default": "mysql://root:2022141461051@localhost:3306/travel"
+        "default": "mysql://root:2022141461051@mysql:3306/travel"
     },
     "apps": {
         "models": {
