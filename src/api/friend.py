@@ -34,7 +34,7 @@ async def send_message_picture(user_id1: str, user_id2: str, content: str, creat
     save_directory = "static/conversation"  # 存放头像文件的目录
     file_extension = os.path.splitext(file.filename)[1]  # 获取文件的扩展名
     save_path = save_directory + f"/{safe_file_name}{file_extension}"
-    async with aiofiles.open(save_path, "wb") as buffer:
+    async with aiofiles.open("src" + save_path, "wb") as buffer:
         await buffer.write(await file.read())
     content = f"##[{save_path}]" + content
     message = {
