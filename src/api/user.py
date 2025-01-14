@@ -97,7 +97,7 @@ async def update_avatar(number: str, avatar: UploadFile = File(...)):
     save_path = save_directory+ f"/{number}{file_extension}"  # 例如: avatars/12345.jpg
     user_exist.avatar = save_path
 
-    async with aiofiles.open(save_path, "wb") as buffer:
+    async with aiofiles.open("src/"+save_path, "wb") as buffer:
         await buffer.write(await avatar.read())
     await user_exist.save()
 
