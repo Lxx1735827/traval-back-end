@@ -88,6 +88,7 @@ def on_message(ws, message, wsParam):
 
 
 def pcm2wav(pcm_file, wav_file, channels=1, bits=16, sample_rate=16000):
+    print(pcm_file, wav_file)
     with open(pcm_file, 'rb') as pcmf:
         pcmdata = pcmf.read()
 
