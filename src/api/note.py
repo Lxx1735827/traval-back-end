@@ -26,7 +26,7 @@ async def create_note(number: str,  name: str, content: str, files: List[UploadF
         timestamp_ms = str(time.time() * 1000)
         file_suffix = file.filename.split(".")[-1]
         file_path = "static/note/" + timestamp_ms + "." + file_suffix
-        async with aiofiles.open(file_path, "wb") as buffer:
+        async with aiofiles.open("src/" + file_path, "wb") as buffer:
             await buffer.write(await file.read())
         pictures += file_path+"###"
     await Note.create(name=name, picture=pictures, content=content, user=exist_user, tag=tag)
@@ -39,7 +39,7 @@ async def create_hot():
     # 更新旅游热点
     hots = get_hot()
     for hot in hots:
-        create_picture(hot, "static/hot/"+hot+".jpg")
+        create_picture(hot, "src/static/hot/"+hot+".jpg")
         current_date = str(date.today())
         sites = get_sites(hot)
         ids = ""
@@ -47,7 +47,7 @@ async def create_hot():
             try:
                 city, name, description = get_info(site)
                 location, longitude, latitude = get_location(site, city)
-                create_picture(name, "static/site/"+name+".jpg")
+                create_picture(name, "src/static/site/"+name+".jpg")
                 site_data = {
                     "name": name,
                     "city": city,
@@ -68,14 +68,14 @@ async def create_hot():
 @note.get("/create-people", description="文人路线")
 async def create_people(people: str, sites: str):
     sites = sites.split(",")
-    create_picture(people, "static/hot/" + people + ".jpg")
+    create_picture(people, "src/static/hot/" + people + ".jpg")
     current_date = str(date.today())
     ids = ""
     for site in sites:
         try:
             city, name, description = get_info(site)
             location, longitude, latitude = get_location(site, city)
-            create_picture(name, "static/site/" + name + ".jpg")
+            create_picture(name, "src/static/site/" + name + ".jpg")
             site_data = {
                 "name": name,
                 "city": city,
@@ -104,7 +104,7 @@ async def create_book(book: str, sites: str):
         try:
             city, name, description = get_info(site)
             location, longitude, latitude = get_location(site, city)
-            create_picture(name, "static/site/" + name + ".jpg")
+            create_picture(name, "src/static/site/" + name + ".jpg")
             site_data = {
                 "name": name,
                 "city": city,
