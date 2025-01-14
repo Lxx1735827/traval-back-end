@@ -102,6 +102,7 @@ def build_payload(image_base64, question):
 
 async def send_request(image_path, question, conversation: Conversation):
     # 获取图像的 base64 编码
+    image_path = "src/" + image_path
     image_base64 = image_to_base64(image_path)
     payload = build_payload(image_base64, question)
     websocket.enableTrace(True)
