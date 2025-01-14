@@ -18,8 +18,8 @@ async def get_qrcode(source: str, user_number: str) -> None:
 
     user_exist.qrcode = f"static/qrcode/{user_number}.png"
 
-    if not os.path.exists(source):
-        os.makedirs(source)
+    if not os.path.exists("src/" + source):
+        os.makedirs("src/" + source)
 
     qr = qrcode.QRCode(
         version=2,  # 尺寸
@@ -37,7 +37,7 @@ async def get_qrcode(source: str, user_number: str) -> None:
         filename = user_exist.number + '.jpg'
         file = source + "/" + filename
         # 添加logo，打开logo照片
-        icon = Image.open(user_exist.avatar)
+        icon = Image.open("src/" + user_exist.avatar)
         print("icon")
         # 获取图片的宽高
         img_w, img_h = img.size
@@ -58,7 +58,7 @@ async def get_qrcode(source: str, user_number: str) -> None:
         # 黏贴logo照
         img.paste(icon, (w, h), mask=None)
         # 保存
-        img.save(file)
+        img.save("src/" + file)
         print(f"QR Code {filename} produced!")
         return file
     except Exception as e:
