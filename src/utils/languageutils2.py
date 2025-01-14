@@ -148,7 +148,7 @@ class SpeechRecognitionClient:
 def audio_to_text(audio_file):
     ws_param = Ws_Param(APPID='223a24c2', APISecret='ZjhlZDQyMDU3Y2NhYjMwYmExZGRmYmMy',
                         APIKey='e2f620fdc9d52be5e0f792d4e1755416',
-                        AudioFile=audio_file)
+                        AudioFile="src" + audio_file)
 
     client = SpeechRecognitionClient(ws_param)
     client.start()  # Start the WebSocket connection

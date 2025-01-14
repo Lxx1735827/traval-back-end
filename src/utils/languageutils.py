@@ -114,7 +114,7 @@ def text_to_audio(text, filename, location):
                        APISecret='ZjhlZDQyMDU3Y2NhYjMwYmExZGRmYmMy',
                        APIKey='e2f620fdc9d52be5e0f792d4e1755416',
                        Text=text,
-                       wav_filename=filename,
+                       wav_filename="src/"+filename,
                        people=city_people[location])
 
     websocket.enableTrace(False)
