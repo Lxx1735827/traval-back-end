@@ -61,7 +61,7 @@ async def create_picture(pictures: List[UploadFile], info: str=Body(...)):
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
         # 创建文件名（使用时间戳和文件后缀）
         file_name = f"{timestamp}{file_extension}"
-        file_path = "static/route/"+file_name
+        file_path = "src/static/route/"+file_name
         file_paths.append(file_path)
         with open(file_path, "wb") as file:
             file.write(contents)

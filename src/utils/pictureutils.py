@@ -50,7 +50,7 @@ async def day_routes(pictures: List[str], info: str):
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
     file_name = f"{timestamp}.png"
     file_path = "static/route/" + file_name
-    plt.savefig(file_path, bbox_inches='tight', dpi=1500, pad_inches=0)
+    plt.savefig("src/"+file_path, bbox_inches='tight', dpi=1500, pad_inches=0)
     plt.close()
     return file_path
 
