@@ -331,7 +331,7 @@ async def get_friend_ask(user_number: str):
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
 
     friendships = await Friendship.filter(
-        (Q(user1_number=user_number & Q(status=2)) | Q(user2_number=user_number) & Q(status=1))
+        (Q(user1_number=user_number) & Q(status=2)) | (Q(user2_number=user_number) & Q(status=1))
     )
     users_list = []
     if friendships:
