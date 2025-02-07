@@ -16,17 +16,7 @@ import os
 # Mapping for different voice choices based on location/dialect
 city_people = {
     "普通话": "xiaoyan",
-    "安徽话": "x2_xiaofei",
-    "上海话": "x3_ziling",
-    "湖南话": "x2_xiaoqiang",
-    "山东话": "x2_xiaodong",
-    "广东话": "x_xiaomei",
-    "东北话": "x2_xiaoqian",
-    "内蒙古话": "x2_xiaobao",
-    "藏语": "x2_BoCn_YangJin",
-    "四川话": "x3_yezi_sc",
-    "湖北话": "x2_xiaowang",
-    "河南话": "x2_xiaokun"
+    "四川话": "x2_xiaorong",
 }
 
 class Ws_Param(object):
