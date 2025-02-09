@@ -41,7 +41,7 @@ async def create_hot():
     for hot in hots:
         create_picture(hot, "src/static/hot/"+hot+".jpg")
         current_date = str(date.today())
-        sites = get_sites(hot)
+        sites = get_sites_(hot)
         ids = ""
         for site in sites:
             try:
