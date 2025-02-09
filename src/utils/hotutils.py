@@ -35,7 +35,7 @@ def get_hot():
     return titles
 
 
-def get_sites(content):
+def get_sites_(content):
     que: str = "根据这个标题:"+content + """，推荐8个相关景点，只返回景点中文，用英文逗号隔开"""
     return completion2(que).split(',')
 
