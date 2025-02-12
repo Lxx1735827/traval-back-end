@@ -172,7 +172,7 @@ async def note_reviews(note_id: int):
     for review in reviews:
         print(type(review.user_number))
         print(review.user_number)
-        user = await User.filter(id=review.user_number).first()
+        user = await User.filter(number=review.user_number).first()
         data.append({
             "id": review.id,
             "user_number": review.user_number,
