@@ -167,7 +167,7 @@ async def notes_get(user_id: str):
 
 @note.get("/note/reviews", description="获取一个笔记的所有评论")
 async def note_reviews(note_id: int):
-    reviews = await NoteReview.filter(id=note_id).all()
+    reviews = await NoteReview.filter(entity_id=note_id).all()
     data = []
     for review in reviews:
         print(type(review.user_number))
