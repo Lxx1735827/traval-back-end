@@ -94,7 +94,8 @@ async def update_avatar(number: str, avatar: UploadFile = File(...)):
 
     save_directory = "static/user"  # 存放头像文件的目录
     file_extension = os.path.splitext(avatar.filename)[1]  # 获取文件的扩展名
-    save_path = save_directory+ f"/{number}{file_extension}"  # 例如: avatars/12345.jpg
+    timestamp_ms = int(time.time() * 1000)
+    save_path = save_directory+ f"/{timestamp_ms}{file_extension}"  # 例如: avatars/12345.jpg
     user_exist.avatar = save_path
 
     async with aiofiles.open("src/"+save_path, "wb") as buffer:
