@@ -170,7 +170,7 @@ async def note_reviews(note_id: int):
     reviews = await NoteReview.filter(id=note_id).all()
     data = []
     for review in reviews:
-        user = await User.filter(number=review.user_number).first()
+        user = await User.filter(id=review.user_number).first()
         data.append({
             "id": review.id,
             "user_number": review.user_number,
