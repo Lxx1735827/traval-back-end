@@ -140,10 +140,9 @@ async def get_recommend(tag: str):
 async def get_sites(tag_id: int):
     datas = await Recommend.get_or_none(id=tag_id)
     sites_id = datas.sites_id[:-1].split(',')
-    print(sites_id)
     sites_id = [int(site) for site in sites_id]
     sites = await Site.filter(id__in=sites_id).all()
-    info = [{"id": site.id, "name": site.name, "picture": site.picture, "description": site.description} for site in sites]
+    info = [{"id": site.id, "name": site.name, "picture": site.picture, "description": site.description, "location": site.location, "latitude": site.latitude, "longitude": site.longitude} for site in sites]
     return {"data": info}
 
 
