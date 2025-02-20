@@ -27,7 +27,7 @@ async def day_routes(pictures: List[str], info: str):
     data = info_map["datas"]
 
     # 设置图形大小，增加高度以适应所有图片
-    fig, ax = plt.subplots(figsize=(3, 3 * len(data)))  # 高度根据图片数量动态调整
+    fig, ax = plt.subplots(figsize=(2, 3 * len(data)))  # 高度根据图片数量动态调整
     fig.patch.set_facecolor('#FFE4E1')  # 使用更浅的粉色背景
 
     first = 3 * len(data) - 0.1 # 设置初始位置，确保从顶部开始
