@@ -14,7 +14,7 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-    plt.rcParams["font.sans-serif"] = ["SimHei"]  # 设置字体
+    plt.rcParams['font.family'] = 'WenQuanYi Micro Hei'
     plt.rcParams["axes.unicode_minus"] = False  # 正常显示负号
 
     info_map = json.loads(info)
