@@ -3,7 +3,6 @@ import matplotlib.image as mpimg
 from datetime import datetime
 from typing import List
 import matplotlib
-from matplotlib import font_manager
 import json
 
 
@@ -14,10 +13,10 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-
-    font_path = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
-    prop = font_manager.FontProperties(fname=font_path)
-    plt.rcParams['font.family'] = prop.get_name()
+    plt.rcParams.update(plt.rcParamsDefault)
+    matplotlib.rcParams['font.family'] = 'Noto Sans CJK SC'  # 对中文字符有支持
+    from matplotlib import font_manager
+    print([f.name for f in font_manager.fontManager.ttflist])
 
     info_map = json.loads(info)
     data = info_map["datas"]
