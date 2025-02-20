@@ -119,7 +119,11 @@ async def update_user(new_user: UserSchema):
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User not found.")
     # 更新用户信息
-    user_exist.password = new_user.password
+    salt, derived_key, iterations = generate_password_hash(new_user.password)
+    salt_hex = binascii.hexlify(salt).decode('utf-8')
+    derived_key_hex = binascii.hexlify(derived_key).decode('utf-8')
+    user_exist.password = derived_key_hex
+    user_exist.salt = salt_hex
     user_exist.username = new_user.username
 
     # 保存更新
