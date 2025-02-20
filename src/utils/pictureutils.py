@@ -13,7 +13,7 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-    matplotlib.rcParams['font.family'] = 'SimHei'  # 对中文字符有支持
+    matplotlib.rcParams['font.family'] = 'Noto Sans CJK'  # 对中文字符有支持
 
     info_map = json.loads(info)
     data = info_map["datas"]
