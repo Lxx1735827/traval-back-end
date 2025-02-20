@@ -171,11 +171,11 @@ def calculate(city_list: list):
         time.sleep(1)
         if calculate_distance(city_list[i]["latitude"], city_list[i]["longitude"], city_list[i-1]["latitude"], city_list[i-1]["longitude"]) < 1:
             respond = get_walk_time(city_list[i-1], city_list[i])
-            ways.append(0)
+            ways.append(1)
             times.append(respond)
         else:
             respond = get_car_time(city_list[i - 1], city_list[i])
-            ways.append(1)
+            ways.append(0)
             times.append(respond)
     return times, ways
 
