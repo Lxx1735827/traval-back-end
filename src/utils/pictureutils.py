@@ -46,7 +46,7 @@ async def day_routes(pictures: List[str], info: str):
             if j != len(names)-1:
                 ax.plot([left, left+0.5], [first-1.8-0.1+0.02, first-1.8-0.1+0.02], color='skyblue', linewidth=1)
                 ax.plot([left, left+0.5], [first-1.8-0.1-0.02, first-1.8-0.1-0.02], color='skyblue', linewidth=1)
-                ax.text(left+0.25, first - 1.8 - 0.1 - 0.05, "{:.2f}".format(times[j])+"h", rotation=0, fontsize=5, color='skyblue', ha='center',
+                ax.text(left+0.25, first - 1.8 - 0.1 - 0.05, "{:.2f}".format(times[j])+"h", rotation=0, fontsize=3, color='skyblue', ha='center',
                         va='top')
 
             left += 0.5
