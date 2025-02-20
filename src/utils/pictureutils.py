@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from datetime import datetime
+import os
 import matplotlib as mpl
 from typing import List
 import matplotlib
@@ -15,6 +16,7 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
+    print(os.path.join(os.path.dirname(matplotlib.matplotlib_fname()), 'fonts', 'ttf'))
     font_path = '/usr/share/fonts/truetype/SimHei.ttf'
     prop = font_manager.FontProperties(fname=font_path)
 
