@@ -4,6 +4,7 @@ from datetime import datetime
 import matplotlib as mpl
 from typing import List
 import matplotlib
+from matplotlib import font_manager
 import json
 
 
@@ -14,8 +15,11 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-    plt.rcParams['font.family'] = 'SimHei'  # 替换为你选择的字体
-    plt.rcParams["axes.unicode_minus"] = False  # 正常显示负号
+    font_path = '/usr/share/fonts/truetype/SimHei.ttf'
+    prop = font_manager.FontProperties(fname=font_path)
+
+    # 设置字体
+    plt.rcParams['font.family'] = prop.get_name()
 
     info_map = json.loads(info)
     data = info_map["datas"]
