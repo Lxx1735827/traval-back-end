@@ -14,13 +14,8 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-    # 查找字体路径
-    print("============================")
-    print(matplotlib.matplotlib_fname())
-    plt.rcParams.update(plt.rcParamsDefault)
-    matplotlib.rcParams['font.family'] = 'Noto Sans CJK SC'  # 对中文字符有支持
-    from matplotlib import font_manager
-    print([f.name for f in font_manager.fontManager.ttflist])
+    plt.rcParams["font.sans-serif"] = ["SimHei"]  # 设置字体
+    plt.rcParams["axes.unicode_minus"] = False  # 正常显示负号
 
     info_map = json.loads(info)
     data = info_map["datas"]
