@@ -14,11 +14,8 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
-    # 指定字体路径
-    font_path = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'  # 根据你系统上的字体路径修改
-    prop = font_manager.FontProperties(fname=font_path)
-    # 使用指定的字体
-    plt.rcParams['font.family'] = prop.get_name()
+    # 使用 Noto Sans CJK SC（根据你的安装情况选择适当的变体）
+    plt.rcParams['font.family'] = 'Noto Sans CJK SC'
 
     info_map = json.loads(info)
     data = info_map["datas"]
