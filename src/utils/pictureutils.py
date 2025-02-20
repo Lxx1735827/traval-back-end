@@ -14,6 +14,8 @@ async def day_routes(pictures: List[str], info: str):
     :return:
     """
     matplotlib.rcParams['font.family'] = 'Noto Sans CJK'  # 对中文字符有支持
+    from matplotlib import font_manager
+    print([f.name for f in font_manager.fontManager.ttflist])
 
     info_map = json.loads(info)
     data = info_map["datas"]
