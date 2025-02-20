@@ -13,6 +13,8 @@ async def day_routes(pictures: List[str], info: str):
     :param info: 路径信息
     :return:
     """
+    # 查找字体路径
+    print(matplotlib.matplotlib_fname())
     plt.rcParams.update(plt.rcParamsDefault)
     matplotlib.rcParams['font.family'] = 'Noto Sans CJK SC'  # 对中文字符有支持
     from matplotlib import font_manager
