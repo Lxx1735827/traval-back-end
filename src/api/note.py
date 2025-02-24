@@ -125,15 +125,9 @@ async def create_book(book: str, sites: str):
 
 @note.get("/get-recommend/{tag}", description="获得推荐目录")
 async def get_recommend(tag: str):
-    if tag == '热点':
-        current_date = str(date.today())
-        datas = await Recommend.filter(Q(day_time=current_date) & Q(tag=tag))
-        info = [{"id": data.id, "name": data.name, "picture": data.picture} for data in datas]
-        return {"data": info}
-    else:
-        datas = await Recommend.filter(tag=tag)
-        info = [{"id": data.id, "name": data.name, "picture": data.picture} for data in datas]
-        return {"data": info}
+    datas = await Recommend.filter(tag=tag)
+    info = [{"id": data.id, "name": data.name, "picture": data.picture} for data in datas]
+    return {"data": info}
 
 
 @note.get("/get-sites/{tag_id}", description="获得景点")
