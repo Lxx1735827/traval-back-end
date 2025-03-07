@@ -355,7 +355,13 @@ async def get_footprint(user_number: str):
     for site_record in site_records:
         site = await Site.get_or_none(id=site_record.site_id)
         sites.append({"site": site.name, "id": site.id, "site_lat": site.latitude, "site_lon": site.longitude})
-    return sites
+    url = "https://restapi.amap.com/v3/staticmap?size=1024*1024&paths=10,0x0000ff,1,,:"
+    for site in sites:
+        url += str(site["site_lon"]) + "," + str(site["site_lat"]) + ";"
+    url = url[:-1]
+    url += "&key=b616bf2caaffd75f06040af47d4c9e21"
+
+    return {"url": url}
 
 
 
