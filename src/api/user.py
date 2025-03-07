@@ -1,14 +1,9 @@
-import re
-
 import aiofiles
 import requests
 import time
-from fastapi import APIRouter, File, UploadFile, HTTPException
-from tortoise import Tortoise
-from tortoise.exceptions import DoesNotExist
+from fastapi import APIRouter, File, UploadFile
 from tortoise.expressions import Q
 from src.schema import *
-from src.setting import *
 from src.utils.passwordutils import *
 from src.utils.codeutils import *
 from src.utils.qrcode_utils import *
@@ -355,10 +350,12 @@ async def get_footprint(user_number: str):
     user_exist = await User.get_or_none(number=user_number).prefetch_related('check_sites')
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
-    sites = user_exist.check_sites
-    print(len(sites))  # 现在可以安全地打印 sites 的长度
-    for site in sites:
-        print(site.id)  # 打印每个 site 的 id
+    sites_id = await UserCheckSite.filter(user_number=user_number)
+    sites = []
+    for site_id in sites_id:
+        site = await Site.get_or_none(id=site_id)
+        sites.append({"site": site.name, "id": site.id, "site_lat": site.latitude, "site_lon": site.longitude})
+    return sites
 
 
 
