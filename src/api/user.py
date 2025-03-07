@@ -351,13 +351,13 @@ async def get_friend_ask(user_number: str):
 
 
 @user.get("/footprint/{user_number}", description="生成历史足迹")
-def get_footprint(user_number: str):
+async def get_footprint(user_number: str):
     user_exist = await User.get_or_none(number=user_number)
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
     sites = user_exist.visit_sites
     print(sites)
-    
+
 
 
 
