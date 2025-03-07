@@ -355,7 +355,7 @@ async def get_footprint(user_number: str):
     user_exist = await User.get_or_none(number=user_number).prefetch_related('check_site')
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
-    sites = user_exist.check_users
+    sites = user_exist.check_sites
     print(len(sites))  # 现在可以安全地打印 sites 的长度
     for site in sites:
         print(site.id)  # 打印每个 site 的 id
