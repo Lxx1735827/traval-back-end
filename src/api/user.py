@@ -350,10 +350,10 @@ async def get_footprint(user_number: str):
     user_exist = await User.get_or_none(number=user_number).prefetch_related('check_sites')
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
-    sites_id = await UserCheckSite.filter(user_number=user_number)
+    site_records = await UserCheckSite.filter(user_number=user_number)
     sites = []
-    for site_id in sites_id:
-        site = await Site.get_or_none(id=site_id)
+    for site_record in site_records:
+        site = await Site.get_or_none(id=site_record.site_id)
         sites.append({"site": site.name, "id": site.id, "site_lat": site.latitude, "site_lon": site.longitude})
     return sites
 
