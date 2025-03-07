@@ -356,8 +356,7 @@ async def get_footprint(user_number: str):
     if user_exist is None:
         raise HTTPException(status_code=404, detail="User with this phone number does not exist.")
     sites = user_exist.visit_sites
-    for site in sites:
-        print(site.id)
+    print(len(sites))
 
 
 
