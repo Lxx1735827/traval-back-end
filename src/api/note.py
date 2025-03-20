@@ -179,7 +179,7 @@ async def note_reviews(note_id: int):
 @note.get("/note/{note_id}", description="获得一个笔记的所有信息")
 async def note_get(note_id: int):
     note_ = await Note.filter(id=note_id).select_related('user').first()
-    if note_ is Note:
+    if note_ is None:
         raise HTTPException(status_code=404, detail="笔记不存在")
 
     data = {
