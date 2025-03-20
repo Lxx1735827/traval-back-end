@@ -181,7 +181,7 @@ async def note_get(note_id: int):
     note_ = await Note.filter(id=note_id).select_related('user').first()
     if note_ is None:
         raise HTTPException(status_code=404, detail="笔记不存在")
-
+    print(note_id)
     data = {
         "user_number": note_.user.number,
         "user_avatar": note_.user.avatar,
