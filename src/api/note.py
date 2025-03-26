@@ -187,7 +187,8 @@ async def note_get(note_id: int):
         "user_name": note_.user.username,
         "pictures": note_.picture,
         "name": note_.name,
-        "content": note_.content
+        "content": note_.content,
+        "tag": note_.tag
     }
     return {"data": data}
 
