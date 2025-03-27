@@ -33,7 +33,10 @@ async def create_routes(routes: List[DayRouteSchema]):
         day = days[i]
         id_ = ids[i]
         times_cost = calculate_time(day)
-        way = find_shortest_path(calculate_all_pairs_shortest_paths(times_cost), len(day)-1)
+        if len(times_cost) > 5:
+            way = simulated_annealing(times_cost)
+        else:
+            way = find_shortest_path(calculate_all_pairs_shortest_paths(times_cost), len(day)-1)
         names = [list(day.keys())[way[i]] for i in range(0, len(way))]
         id_ = [id_[way[i]] for i in range(0, len(way))]
         cities = [day[name] for name in day.keys()]

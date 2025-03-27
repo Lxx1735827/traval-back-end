@@ -1,8 +1,9 @@
 import requests
 import heapq
 import sys
-import math
 import time
+import random
+import math
 from src.setting import *
 from src.accesskey import *
 from fastapi import HTTPException
@@ -178,6 +179,47 @@ def calculate(city_list: list):
             ways.append(0)
             times.append(respond)
     return times, ways
+
+
+def calculate_cost(path, cost_matrix):
+    total_cost = 0
+    for i in range(len(path) - 1):
+        total_cost += cost_matrix[path[i]][path[i + 1]]
+    return total_cost
+
+def simulated_annealing(cost_matrix, initial_temp=1000, final_temp=1e-4, alpha=0.995, max_iter=1000):
+    n_nodes = len(cost_matrix)
+    start, end = 0, n_nodes - 1
+
+    # 初始路径：起点0 + 随机中间节点顺序 + 终点n
+    middle_nodes = list(range(1, n_nodes - 1))
+    random.shuffle(middle_nodes)
+    current_path = [start] + middle_nodes + [end]
+    current_cost = calculate_cost(current_path, cost_matrix)
+
+    best_path = current_path[:]
+    best_cost = current_cost
+    temp = initial_temp
+
+    while temp > final_temp:
+        for _ in range(max_iter):
+            # 产生邻域解：交换两个中间节点
+            i, j = sorted(random.sample(range(1, n_nodes - 1), 2))
+            new_path = current_path[:]
+            new_path[i], new_path[j] = new_path[j], new_path[i]
+            new_cost = calculate_cost(new_path, cost_matrix)
+
+            delta = new_cost - current_cost
+            if delta < 0 or random.random() < math.exp(-delta / temp):
+                current_path = new_path
+                current_cost = new_cost
+                if new_cost < best_cost:
+                    best_path = new_path
+                    best_cost = new_cost
+
+        temp *= alpha
+
+    return best_path
 
 
 # if __name__ == "__main__":
