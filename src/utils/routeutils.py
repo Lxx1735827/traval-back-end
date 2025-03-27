@@ -187,7 +187,7 @@ def calculate_cost(path, cost_matrix):
         total_cost += cost_matrix[path[i]][path[i + 1]]
     return total_cost
 
-def simulated_annealing(cost_matrix, initial_temp=1000, final_temp=1e-4, alpha=0.995, max_iter=1000):
+def simulated_annealing(cost_matrix, initial_temp=1000, final_temp=1e-3, alpha=0.995, max_iter=500):
     n_nodes = len(cost_matrix)
     start, end = 0, n_nodes - 1
 
