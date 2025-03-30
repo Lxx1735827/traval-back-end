@@ -203,7 +203,7 @@ async def note_review(number: str, note_id: int, content: str, create_time: str)
 @note.post("/recommend", description="笔记推送")
 async def note_recommend(number: str):
     notes = await Note.filter().all()
-    notes = notes[:10]
+    notes = notes[-10:]
     data = []
     for note_ in notes:
         picture = note_.picture.split("##")[0]
