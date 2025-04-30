@@ -157,3 +157,12 @@ class Recommend(Model):
     sites_id = fields.CharField(max_length=100, description="相关景点id字符串")
     day_time = fields.CharField(max_length=10, description="日期")
     picture = fields.CharField(max_length=100, description="封面图片")
+
+
+class Document(Model):
+    id = fields.IntField(pk=True)
+    title = fields.CharField(max_length=255)
+    content = fields.TextField()
+
+    class Meta:
+        table = "documents"
