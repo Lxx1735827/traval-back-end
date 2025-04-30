@@ -10,6 +10,7 @@ from src.api.route import route
 from src.api.blockchain import bc
 from src.api.language import language
 from src.api.friend import friend
+from src.api.RAGtest import RAG
 from src.api.note import note
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
@@ -28,6 +29,7 @@ app.include_router(bc, prefix="/bc", tags=["bc"])
 app.include_router(language, prefix="/language", tags=["language"])
 app.include_router(friend, prefix="/friend", tags=["friend"])
 app.include_router(note, prefix="/note", tags=["note"])
+app.include_router(RAG, prefix="/RAG", tags=["RAG"])
 
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
